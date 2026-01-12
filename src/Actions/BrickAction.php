@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Awcodes\Mason\Actions;
 
 use Awcodes\Mason\Mason;
-use Awcodes\Mason\Support\EditorCommand;
+use Awcodes\Mason\Support\BlockCommand;
 use Filament\Actions\Action;
 use Filament\Support\Enums\Width;
 
@@ -58,67 +58,38 @@ class BrickAction
                     ],
                 ];
 
+                $mode = $arguments['mode'] ?? 'insert';
+                $state = $component->getState() ?? [];
+                
+                if (! is_array($state)) {
+                    $state = [];
+                }
+
                 // Insert at the dragged position
                 if (filled($arguments['dragPosition'] ?? null)) {
-                    $component->runCommands(
-                        [
-                            EditorCommand::make(
-                                'insertContentAt',
-                                arguments: [
-                                    $arguments['dragPosition'],
-                                    $brickContent,
-                                ],
-                            ),
-                        ],
-                    );
+                    $position = (int) $arguments['dragPosition'];
+                    $component->executeCommands([
+                        BlockCommand::insertBlock($brickContent, $position),
+                    ]);
 
                     return;
                 }
 
-                // Insert after the currently selected node
-                if (
-                    ($arguments['editorSelection']['type'] === 'node') &&
-                    (($arguments['mode'] ?? null) === 'insert')
-                ) {
-                    $component->runCommands(
-                        [
-                            EditorCommand::make(
-                                'insertContentAt',
-                                arguments: [
-                                    ($arguments['editorSelection']['anchor'] ?? -1) + 1,
-                                    $brickContent,
-                                ],
-                            ),
-                        ],
-                    );
+                // Edit existing block
+                if ($mode === 'edit' && isset($arguments['blockIndex'])) {
+                    $index = (int) $arguments['blockIndex'];
+                    $component->executeCommands([
+                        BlockCommand::updateBlock($index, $brickContent),
+                    ]);
 
                     return;
                 }
 
-                // Fixes an issue where the editor selection is sent as text instead of a node,
-                // which causes the block update to fail when though the block is selected.
-                if (
-                    (($arguments['mode'] ?? null) === 'edit') &&
-                    ($arguments['editorSelection']['type'] !== 'node')
-                ) {
-                    $arguments['editorSelection']['type'] = 'node';
-                    $arguments['editorSelection']['anchor']--;
-
-                    unset($arguments['editorSelection']['head']);
-                }
-
-                // Insert at the current selection
-                $component->runCommands(
-                    [
-                        EditorCommand::make(
-                            'insertContent',
-                            arguments: [
-                                $brickContent,
-                            ],
-                        ),
-                    ],
-                    editorSelection: $arguments['editorSelection'],
-                );
+                // Insert at the end (default for insert mode)
+                $position = count($state);
+                $component->executeCommands([
+                    BlockCommand::insertBlock($brickContent, $position),
+                ]);
             });
     }
 }

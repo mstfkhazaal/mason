@@ -10,79 +10,11 @@
             @apply flex max-h-[40rem];
 
             .mason-editor-wrapper {
-                @apply flex-1;
+                @apply flex-1 relative;
 
-                .mason-editor {
-                    @apply min-h-full overflow-y-auto flex-1 h-full;
-
-                    .tiptap {
-                        @apply min-h-full;
-
-                        p.is-empty {
-                           @apply h-0;
-
-                            &:first-child {
-                                @apply py-1 px-2 h-auto before:float-left before:h-0 before:pointer-events-none text-gray-500 dark:text-gray-400 before:content-[attr(data-placeholder)];
-                            }
-                        }
-
-                        [data-type="brick"] {
-                            min-height: 2rem;
-                            position: relative;
-
-                            .mason-brick-loader {
-                                @apply animate-spin m-4 h-5 w-5 text-gray-950 dark:text-white;
-
-                                circle {
-                                    @apply opacity-25;
-                                }
-
-                                path {
-                                    @apply opacity-75;
-                                }
-                            }
-
-                            .mason-brick-rendered {
-                                @apply cursor-grab;
-
-                                * {
-                                    @apply pointer-events-none;
-                                }
-                            }
-
-                            .mason-brick-controls {
-                                @apply hidden transition z-[1] top-0.5 right-0.5 absolute p-2 rounded-bl-md items-center bg-gray-700 dark:bg-gray-950;
-
-                                .mason-icon-btn {
-                                    @apply text-white block rounded p-1 hover:text-primary-500 hover:bg-gray-800;
-
-                                    svg {
-                                        @apply w-6 h-6 lg:w-4 lg:h-4;
-                                    }
-
-                                    &:disabled {
-                                        @apply opacity-50;
-                                    }
-                                }
-                            }
-
-                            &:first-of-type {
-                                [data-move-up-button] {
-                                    @apply hidden;
-                                }
-                            }
-
-                            &:last-of-type {
-                                [data-move-down-button] {
-                                    @apply hidden;
-                                }
-                            }
-
-                            .mason-delete-brick-btn .mason-icon-btn {
-                                @apply text-danger-400 dark:text-danger-400;
-                            }
-                        }
-                    }
+                .mason-iframe {
+                    @apply min-h-full w-full border-0;
+                    background: white;
                 }
             }
 
@@ -138,13 +70,8 @@
     }
 
     &:focus-within {
-        .ProseMirror-selectednode {
-            outline-offset: -4px;
-            outline: var(--mason-primary) solid 4px;
-
-            .mason-brick-controls {
-                @apply !flex;
-            }
+        .mason-iframe {
+            @apply ring-2 ring-primary-500;
         }
     }
 
@@ -159,7 +86,7 @@
             }
         }
 
-        .mason-editor {
+        .mason-iframe {
             container-type: inline-size;
         }
     }
@@ -172,20 +99,20 @@
             @apply p-6;
         }
 
-        .mason-editor-wrapper .mason-editor {
+        .mason-editor-wrapper .mason-iframe {
             @apply bg-white dark:bg-gray-900;
         }
     }
 
     &.display-mobile {
-        .mason-editor-wrapper .mason-editor {
+        .mason-editor-wrapper .mason-iframe {
             @apply mx-auto;
             max-width: 392px !important;
         }
     }
 
     &.display-tablet {
-        .mason-editor-wrapper .mason-editor {
+        .mason-editor-wrapper .mason-iframe {
             @apply mx-auto !max-w-screen-md;
         }
     }

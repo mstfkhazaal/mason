@@ -24,13 +24,13 @@
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
             statePath: @js($statePath),
             placeholder: @js($getPlaceholder()),
+            isDisabled: @js($isDisabled),
+            isLiveDebounced: @js($isLiveDebounced()),
+            isLiveOnBlur: @js($isLiveOnBlur()),
+            liveDebounce: @js($getLiveDebounce()),
             dblClickToEdit: @js($shouldDblClickToEdit()),
-            deleteBrickButtonIconHtml: @js(generate_icon_html(Heroicon::Trash, alias: 'mason::delete-brick-button')->toHtml()),
-            editBrickButtonIconHtml: @js(generate_icon_html(Heroicon::PencilSquare, alias: 'mason::edit-brick-button')->toHtml()),
-            insertAboveBrickButtonIconHtml: @js(generate_icon_html(Heroicon::BarsArrowUp, alias: 'mason::insert-brick-button')->toHtml()),
-            insertBelowBrickButtonIconHtml: @js(generate_icon_html(Heroicon::BarsArrowDown, alias: 'mason::insert-brick-button')->toHtml()),
-            moveBrickUpButtonIconHtml: @js(generate_icon_html(Heroicon::ArrowUp, alias: 'mason::move-brick-up-button')->toHtml()),
-            moveBrickDownButtonIconHtml: @js(generate_icon_html(Heroicon::ArrowDown, alias: 'mason::move-brick-down-button')->toHtml()),
+            bricks: @js(array_map(fn($brick) => is_string($brick) ? $brick : get_class($brick), $bricks)),
+            previewLayout: @js($getPreviewLayout()),
         })"
         id="{{ 'mason-wrapper-' . $statePath }}"
         class="mason-wrapper"
@@ -60,11 +60,13 @@
                 ])
             >
                 <div class="mason-editor-wrapper">
-                    <div
-                        class="mason-editor"
-                        x-ref="editor"
+                    <iframe
+                        x-ref="previewIframe"
+                        name="mason-preview-iframe"
+                        class="mason-iframe"
                         wire:ignore
-                    ></div>
+                        style="width: 100%; height: 100%; border: none;"
+                    ></iframe>
                 </div>
 
                 @if (! $isDisabled && filled($bricks))

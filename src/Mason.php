@@ -7,8 +7,7 @@ namespace Awcodes\Mason;
 use Awcodes\Mason\Actions\BrickAction;
 use Awcodes\Mason\Concerns\HasBricks;
 use Awcodes\Mason\Concerns\HasSidebar;
-use Awcodes\Mason\Support\EditorCommand;
-use Awcodes\Mason\Support\MasonRenderer;
+use Awcodes\Mason\Support\BlockCommand;
 use Closure;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Contracts\CanBeLengthConstrained;
@@ -16,7 +15,6 @@ use Filament\Forms\Components\Field;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Concerns\HasPlaceholder;
 use Livewire\Component;
-use Tiptap\Editor;
 
 class Mason extends Field implements CanBeLengthConstrained
 {
@@ -33,6 +31,8 @@ class Mason extends Field implements CanBeLengthConstrained
 
     protected bool | Closure | null $shouldDblClickToEdit = null;
 
+    protected string | Closure | null $previewLayout = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -42,26 +42,43 @@ class Mason extends Field implements CanBeLengthConstrained
                 return null;
             }
 
-            $state = $this->getTiptapEditor()->setContent($state)
-                ->descendants(function (object &$node): void {
-                    if ($node->type !== 'masonBrick') {
-                        return;
-                    }
+            // Ensure state is an array
+            if (! is_array($state)) {
+                $state = [];
+            }
 
-                    $brick = $this->getBrick($node->attrs->id);
+            if (array_key_exists('content', $state)) {
+                $state = $state['content'];
+            }
 
-                    if (blank($brick)) {
-                        $node->attrs->label = 'Unknown Brick';
-                        $node->attrs->preview = base64_encode(view('mason::components.unregistered-brick', ['label' => $node->attrs->id])->render());
+            // Add preview data to each block
+            $state = array_map(function (array $block): array {
+                if (($block['type'] ?? null) !== 'masonBrick') {
+                    return $block;
+                }
 
-                        return;
-                    }
+                $id = $block['attrs']['id'] ?? null;
+                $config = $block['attrs']['config'] ?? [];
 
-                    $nodeConfig = json_decode(json_encode($node->attrs->config ?? []), associative: true);
+                if (blank($id)) {
+                    $block['attrs']['label'] = 'Unknown Brick';
+                    $block['attrs']['preview'] = base64_encode(view('mason::components.unregistered-brick', ['label' => $id])->render());
+                    return $block;
+                }
 
-                    $node->attrs->label = $brick::getPreviewLabel($nodeConfig);
-                    $node->attrs->preview = base64_encode($brick::toPreviewHtml($nodeConfig));
-                })->getDocument();
+                $brick = $this->getBrick($id);
+
+                if (blank($brick)) {
+                    $block['attrs']['label'] = 'Unknown Brick';
+                    $block['attrs']['preview'] = base64_encode(view('mason::components.unregistered-brick', ['label' => $id])->render());
+                    return $block;
+                }
+
+                $block['attrs']['label'] = $brick::getPreviewLabel($config);
+                $block['attrs']['preview'] = base64_encode($brick::toPreviewHtml($config));
+
+                return $block;
+            }, $state);
 
             $component->state($state);
         });
@@ -71,19 +88,21 @@ class Mason extends Field implements CanBeLengthConstrained
         });
 
         $this->dehydrateStateUsing(function ($state) {
-            if (! $state) {
+            if (! $state || ! is_array($state)) {
                 return null;
             }
 
-            return $this->getTiptapEditor()->setContent($state)
-                ->descendants(function (object &$node): void {
-                    if ($node->type !== 'masonBrick') {
-                        return;
-                    }
+            // Remove preview data before saving
+            return array_map(function (array $block): array {
+                if (($block['type'] ?? null) !== 'masonBrick') {
+                    return $block;
+                }
 
-                    unset($node->attrs->label);
-                    unset($node->attrs->preview);
-                })->getDocument();
+                unset($block['attrs']['label']);
+                unset($block['attrs']['preview']);
+
+                return $block;
+            }, $state);
         });
     }
 
@@ -95,10 +114,9 @@ class Mason extends Field implements CanBeLengthConstrained
     }
 
     /**
-     * @param  array<EditorCommand>  $commands
-     * @param  ?array<string, mixed>  $editorSelection
+     * @param  array<BlockCommand>  $commands
      */
-    public function runCommands(array $commands, ?array $editorSelection = null): void
+    public function runCommands(array $commands): void
     {
         $key = $this->getKey();
         $livewire = $this->getLivewire();
@@ -110,14 +128,113 @@ class Mason extends Field implements CanBeLengthConstrained
             /** @phpstan-ignore-next-line  */
             livewireId: $livewire->getId(),
             key: $key,
-            editorSelection: $editorSelection,
-            commands: array_map(fn (EditorCommand $command): array => $command->toArray(), $commands),
+            commands: array_map(fn (BlockCommand $command): array => $command->toArray(), $commands),
         );
     }
 
-    public function getTiptapEditor(): Editor
+    /**
+     * Execute block commands on the current state
+     *
+     * @param  array<BlockCommand>  $commands
+     * @return array<int, array<string, mixed>>
+     */
+    public function executeCommands(array $commands): array
     {
-        return MasonRenderer::make()->getEditor();
+        $state = $this->getState() ?? [];
+        
+        if (! is_array($state)) {
+            $state = [];
+        }
+
+        foreach ($commands as $command) {
+            $state = match ($command->name) {
+                'insertBlock' => $this->executeInsertBlock($state, $command->arguments),
+                'updateBlock' => $this->executeUpdateBlock($state, $command->arguments),
+                'deleteBlock' => $this->executeDeleteBlock($state, $command->arguments),
+                'moveBlock' => $this->executeMoveBlock($state, $command->arguments),
+                default => $state,
+            };
+        }
+
+        $this->state($state);
+
+        return $state;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $state
+     * @param  array<string, mixed>  $arguments
+     * @return array<int, array<string, mixed>>
+     */
+    protected function executeInsertBlock(array $state, array $arguments): array
+    {
+        $brick = $arguments['brick'] ?? null;
+        $position = $arguments['position'] ?? count($state);
+
+        if (! $brick) {
+            return $state;
+        }
+
+        array_splice($state, $position, 0, [$brick]);
+
+        return $state;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $state
+     * @param  array<string, mixed>  $arguments
+     * @return array<int, array<string, mixed>>
+     */
+    protected function executeUpdateBlock(array $state, array $arguments): array
+    {
+        $index = $arguments['index'] ?? null;
+        $brick = $arguments['brick'] ?? null;
+
+        if ($index === null || ! isset($state[$index]) || ! $brick) {
+            return $state;
+        }
+
+        $state[$index] = $brick;
+
+        return $state;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $state
+     * @param  array<string, mixed>  $arguments
+     * @return array<int, array<string, mixed>>
+     */
+    protected function executeDeleteBlock(array $state, array $arguments): array
+    {
+        $index = $arguments['index'] ?? null;
+
+        if ($index === null || ! isset($state[$index])) {
+            return $state;
+        }
+
+        array_splice($state, $index, 1);
+
+        return $state;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $state
+     * @param  array<string, mixed>  $arguments
+     * @return array<int, array<string, mixed>>
+     */
+    protected function executeMoveBlock(array $state, array $arguments): array
+    {
+        $from = $arguments['from'] ?? null;
+        $to = $arguments['to'] ?? null;
+
+        if ($from === null || $to === null || ! isset($state[$from])) {
+            return $state;
+        }
+
+        $moved = array_splice($state, $from, 1);
+        array_splice($state, $to, 0, $moved);
+
+        return $state;
     }
 
     public function doubleClickToEdit(bool | Closure $condition = true): static
@@ -130,5 +247,17 @@ class Mason extends Field implements CanBeLengthConstrained
     public function shouldDblClickToEdit(): bool
     {
         return $this->evaluate($this->shouldDblClickToEdit) ?? false;
+    }
+
+    public function previewLayout(string | Closure | null $layout): static
+    {
+        $this->previewLayout = $layout;
+
+        return $this;
+    }
+
+    public function getPreviewLayout(): ?string
+    {
+        return $this->evaluate($this->previewLayout) ?? config('mason.iframe.layout');
     }
 }

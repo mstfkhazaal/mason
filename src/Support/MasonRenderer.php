@@ -5,17 +5,10 @@ declare(strict_types=1);
 namespace Awcodes\Mason\Support;
 
 use Awcodes\Mason\Concerns\HasBricks;
-use Awcodes\Mason\Tiptap\Nodes\MasonBrick;
-use Awcodes\Mason\Tiptap\Nodes\RenderedMasonBrick;
 use Filament\Support\Concerns\EvaluatesClosures;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use Tiptap\Core\Extension;
-use Tiptap\Editor;
-use Tiptap\Nodes\Document;
-use Tiptap\Nodes\Paragraph;
-use Tiptap\Nodes\Text;
 
 class MasonRenderer implements Htmlable
 {
@@ -56,48 +49,31 @@ class MasonRenderer implements Htmlable
         return $this;
     }
 
-    /**
-     * @return array<Extension>
-     */
-    public function getTipTapPhpExtensions(): array
-    {
-        return [
-            app(Document::class, ['options' => ['content' => 'block*']]),
-            app(Text::class),
-            app(Paragraph::class),
-            app(MasonBrick::class, ['bricks' => $this->getBricks()]),
-            app(RenderedMasonBrick::class),
-        ];
-    }
-
-    /**
-     * @return array{extensions: array<Extension>}
-     */
-    public function getTipTapPhpConfiguration(): array
-    {
-        return [
-            'extensions' => $this->getTipTapPhpExtensions(),
-        ];
-    }
-
-    public function getEditor(): Editor
-    {
-        $editor = app(Editor::class, ['configuration' => $this->getTipTapPhpConfiguration()]);
-
-        if (filled($this->content)) {
-            $editor->setContent($this->content);
-        }
-
-        return $editor;
-    }
-
     public function toUnsafeHtml(): string
     {
-        $editor = $this->getEditor();
+        $blocks = $this->getBlocks();
+        $html = [];
 
-        $this->processBricks($editor);
+        foreach ($blocks as $block) {
+            if (($block['type'] ?? null) !== 'masonBrick') {
+                continue;
+            }
 
-        return $editor->getHTML();
+            $id = $block['attrs']['id'] ?? null;
+            $config = $block['attrs']['config'] ?? [];
+
+            if (blank($id)) {
+                continue;
+            }
+
+            $brickHtml = $this->getBrickHtml($id, $config);
+
+            if ($brickHtml) {
+                $html[] = $brickHtml;
+            }
+        }
+
+        return implode('', $html);
     }
 
     public function toHtml(): string
@@ -107,11 +83,10 @@ class MasonRenderer implements Htmlable
 
     public function toText(): string
     {
-        $editor = $this->getEditor();
-
-        $this->processBricks($editor);
-
-        return $editor->getText();
+        $html = $this->toUnsafeHtml();
+        
+        // Strip HTML tags and decode entities
+        return strip_tags($html);
     }
 
     /**
@@ -119,14 +94,32 @@ class MasonRenderer implements Htmlable
      */
     public function toArray(): array
     {
+        return $this->getBlocks();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function getBlocks(): array
+    {
         if (in_array($this->content, ['', '0', []], true) || $this->content === null) {
             return [];
         }
 
-        $editor = $this->getEditor();
-        $this->processBricks($editor);
+        if (is_array($this->content)) {
+            return $this->content;
+        }
 
-        return json_decode($editor->getJSON(), true);
+        // Try to decode JSON if it's a string
+        if (is_string($this->content)) {
+            $decoded = json_decode($this->content, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return [];
     }
 
     /**
@@ -134,38 +127,12 @@ class MasonRenderer implements Htmlable
      */
     public function getBrickHtml(string $id, array $config): ?string
     {
-        foreach ($this->bricks as $key => $brick) {
-            if (is_string($key) && ($key::getId() === $id)) {
-                return $key::toHtml($config, data: value($brick) ?? []);
-            }
+        foreach ($this->getBricks() as $brick) {
             if (is_string($brick) && ($brick::getId() === $id)) {
                 return $brick::toHtml($config, data: []);
             }
         }
 
         return null;
-    }
-
-    protected function processBricks(Editor $editor): void
-    {
-        if (blank($this->bricks)) {
-            return;
-        }
-
-        $editor->descendants(function (object &$node): void {
-            if ($node->type !== 'masonBrick') {
-                return;
-            }
-
-            if (blank($node->attrs->id ?? null)) {
-                return;
-            }
-
-            $nodeConfig = json_decode(json_encode($node->attrs->config ?? []), associative: true);
-
-            $node->type = 'renderedBrick';
-            $node->html = $this->getBrickHtml($node->attrs->id, $nodeConfig);
-            unset($node->attrs->config);
-        });
     }
 }

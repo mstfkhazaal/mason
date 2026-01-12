@@ -7,4 +7,7 @@ return [
         'namespace' => 'App\\Mason',
         'views_path' => 'mason',
     ],
+    'iframe' => [
+        'layout' => null, // Set to your layout view path, e.g., 'layouts.preview'
+    ],
 ];

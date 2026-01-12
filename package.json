@@ -6,21 +6,7 @@
         "build": "node bin/build.js"
     },
     "devDependencies": {
-        "@tiptap/core": "^3.0.0",
-        "@tiptap/extension-document": "^3.0.0",
-        "@tiptap/extension-dropcursor": "^3.0.0",
-        "@tiptap/extension-focus": "^3.0.0",
-        "@tiptap/extension-gapcursor": "^3.0.0",
-        "@tiptap/extension-hard-break": "^3.0.0",
-        "@tiptap/extension-history": "^3.0.0",
-        "@tiptap/extension-paragraph": "^3.0.0",
-        "@tiptap/extension-placeholder": "^3.0.0",
-        "@tiptap/extension-text": "^3.0.0",
-        "@tiptap/html": "^3.0.0",
-        "@tiptap/pm": "^3.0.0",
-        "@tiptap/suggestion": "^3.0.0",
         "esbuild": "^0.25.5",
-        "prettier": "^3.5.3",
-        "tippy.js": "^6.3.7"
+        "prettier": "^3.5.3"
     }
 }

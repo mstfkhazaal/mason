@@ -38,7 +38,7 @@ const defaultOptions = {
     bundle: true,
     mainFields: ['module', 'main'],
     platform: 'neutral',
-    sourcemap: isDev ? 'inline' : false,
+    sourcemap: false, // Disable source maps to avoid URL constructor errors
     sourcesContent: isDev,
     treeShaking: true,
     target: ['es2020'],
