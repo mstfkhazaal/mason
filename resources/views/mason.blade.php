@@ -34,6 +34,7 @@
         })"
         id="{{ 'mason-wrapper-' . $statePath }}"
         class="mason-wrapper"
+        tabindex="-1"
         x-bind:class="{
             'fullscreen': fullscreen,
             'is-focused': isFocused,

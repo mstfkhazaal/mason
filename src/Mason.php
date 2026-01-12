@@ -51,35 +51,6 @@ class Mason extends Field implements CanBeLengthConstrained
                 $state = $state['content'];
             }
 
-            // Add preview data to each block
-            $state = array_map(function (array $block): array {
-                if (($block['type'] ?? null) !== 'masonBrick') {
-                    return $block;
-                }
-
-                $id = $block['attrs']['id'] ?? null;
-                $config = $block['attrs']['config'] ?? [];
-
-                if (blank($id)) {
-                    $block['attrs']['label'] = 'Unknown Brick';
-                    $block['attrs']['preview'] = base64_encode(view('mason::components.unregistered-brick', ['label' => $id])->render());
-                    return $block;
-                }
-
-                $brick = $this->getBrick($id);
-
-                if (blank($brick)) {
-                    $block['attrs']['label'] = 'Unknown Brick';
-                    $block['attrs']['preview'] = base64_encode(view('mason::components.unregistered-brick', ['label' => $id])->render());
-                    return $block;
-                }
-
-                $block['attrs']['label'] = $brick::getPreviewLabel($config);
-                $block['attrs']['preview'] = base64_encode($brick::toPreviewHtml($config));
-
-                return $block;
-            }, $state);
-
             $component->state($state);
         });
 
@@ -141,7 +112,7 @@ class Mason extends Field implements CanBeLengthConstrained
     public function executeCommands(array $commands): array
     {
         $state = $this->getState() ?? [];
-        
+
         if (! is_array($state)) {
             $state = [];
         }

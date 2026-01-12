@@ -62,96 +62,10 @@ class MasonServiceProvider extends PackageServiceProvider
         Blade::directive(
             name: 'masonStyles',
             handler: function (): string {
-                $styles = <<<'CSS'
-                    <style>
-                        body {
-                            margin: 0;
-                            padding: 0;
-                            font-family: system-ui, -apple-system, sans-serif;
-                        }
-                        .mason-block {
-                            position: relative;
-                            min-height: 2rem;
-                            cursor: move;
-                            transition: outline 0.2s;
-                        }
-                        .mason-block:hover {
-                            outline: 2px dashed #0ea5e9;
-                            outline-offset: 2px;
-                        }
-                        .mason-block.selected {
-                            outline: 4px solid #0ea5e9;
-                            outline-offset: -4px;
-                        }
-                        .mason-block.dragging {
-                            opacity: 0.5;
-                            cursor: grabbing;
-                            pointer-events: none;
-                            user-select: none;
-                        }
-                        .mason-block.dragging * {
-                            pointer-events: none;
-                            user-select: none;
-                        }
-                        .mason-block-content {
-                            pointer-events: auto;
-                        }
-                        .mason-block.dragging .mason-block-content * {
-                            pointer-events: none !important;
-                            user-select: none !important;
-                            -webkit-user-select: none !important;
-                            -moz-user-select: none !important;
-                            -ms-user-select: none !important;
-                        }
-                        .mason-block-controls {
-                            position: absolute;
-                            top: 0.5rem;
-                            right: 0.5rem;
-                            z-index: 10;
-                            display: none;
-                            gap: 0.25rem;
-                            padding: 0.5rem;
-                            background: rgba(0, 0, 0, 0.8);
-                            border-radius: 0.25rem;
-                        }
-                        .mason-block.selected .mason-block-controls {
-                            display: flex;
-                        }
-                        .mason-block-btn {
-                            background: transparent;
-                            border: none;
-                            color: white;
-                            cursor: pointer;
-                            padding: 0.25rem;
-                            border-radius: 0.25rem;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        }
-                        .mason-block-btn:hover:not(:disabled) {
-                            background: rgba(255, 255, 255, 0.2);
-                        }
-                        .mason-block-btn:disabled {
-                            opacity: 0.3;
-                            cursor: not-allowed;
-                        }
-                        .mason-block-btn svg {
-                            width: 1rem;
-                            height: 1rem;
-                        }
-                        .mason-drop-zone {
-                            min-height: 2rem;
-                            border: 2px dashed transparent;
-                            transition: border-color 0.2s;
-                        }
-                        .mason-drop-zone.active {
-                            border-color: #0ea5e9;
-                            background: rgba(14, 165, 233, 0.1);
-                        }
-                    </style>
-                CSS;
+                $cssPath = __DIR__ . '/../resources/css/preview.css';
+                $css = file_get_contents($cssPath);
 
-                return $styles;
+                return '<style>' . $css . '</style>';
             }
         );
 

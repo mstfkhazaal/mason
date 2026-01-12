@@ -23,6 +23,7 @@ export default function masonComponent({
     let isDestroyed = false
     let previewUrl = null
     let savedScrollPosition = { x: 0, y: 0 }
+    let focusCheckInterval = null
 
     return {
         state: state,
@@ -91,7 +92,14 @@ export default function masonComponent({
                         this.handleMoveBlock(data.from, data.to)
                         break
                     case 'blockSelected':
-                        // Handle block selection if needed
+                        // Set focus when a block is selected in the preview
+                        // Focus the wrapper so :focus-within works, then let tracker pick it up
+                        if (this.$el) {
+                            this.$el.focus()
+                            // The focus tracker will detect this on next check
+                            // Set it immediately to avoid delay
+                            this.isFocused = true
+                        }
                         break
                 }
             }
@@ -115,8 +123,20 @@ export default function masonComponent({
                 }, 200)
             })
 
+            // Watch for focus changes and notify iframe
+            this.$watch('isFocused', (focused) => {
+                if (isDestroyed) return
+                this.sendMessageToIframe({ 
+                    type: 'setParentFocus', 
+                    focused: focused 
+                })
+            })
+
             // Handle drag and drop from sidebar
             this.setupDragAndDrop()
+
+            // Track focus state on the wrapper element
+            this.setupFocusTracking()
         },
 
 
@@ -182,6 +202,30 @@ export default function masonComponent({
                         this.handleInsertBlock(brickId, position)
                     }
                 })
+            }
+        },
+
+        setupFocusTracking() {
+            // Track focus on the wrapper element and its children using :focus-within
+            const wrapper = this.$el
+            
+            if (wrapper) {
+                const checkFocus = () => {
+                    if (isDestroyed) return false
+                    const hasFocus = wrapper.matches(':focus-within')
+                    if (this.isFocused !== hasFocus) {
+                        this.isFocused = hasFocus
+                    }
+                    return hasFocus
+                }
+                
+                // Check initial focus state
+                this.$nextTick(() => {
+                    checkFocus()
+                })
+                
+                // Check focus state periodically (more reliable than focus events for complex interactions)
+                focusCheckInterval = setInterval(checkFocus, 100)
             }
         },
 
@@ -438,6 +482,11 @@ export default function masonComponent({
                 window.removeEventListener(eventName, handler)
             })
             eventListeners = []
+
+            if (focusCheckInterval) {
+                clearInterval(focusCheckInterval)
+                focusCheckInterval = null
+            }
 
             iframe = null
         },
