@@ -258,6 +258,6 @@ class Mason extends Field implements CanBeLengthConstrained
 
     public function getPreviewLayout(): ?string
     {
-        return $this->evaluate($this->previewLayout) ?? config('mason.iframe.layout');
+        return $this->evaluate($this->previewLayout) ?? config('mason.preview.layout');
     }
 }

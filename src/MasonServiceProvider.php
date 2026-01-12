@@ -10,10 +10,8 @@ use Awcodes\Mason\Testing\TestsMason;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
-use Awcodes\Mason\Support\IframeRenderer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Route;
 use Livewire\Features\SupportTesting\Testable;
 use ReflectionException;
 use Spatie\LaravelPackageTools\Package;
@@ -29,6 +27,7 @@ class MasonServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasTranslations()
+            ->hasRoute('web')
             ->hasCommands([
                 MakeBrickCommand::class,
                 UpgradeBricksCommand::class,
@@ -156,47 +155,7 @@ class MasonServiceProvider extends PackageServiceProvider
             }
         );
 
-        $this->registerRoutes();
-
         Testable::mixin(new TestsMason);
-    }
-
-    protected function registerRoutes(): void
-    {
-        Route::post('/mason/preview', function () {
-            // Handle both JSON and form data
-            $blocksJson = request()->input('blocks');
-            $bricksJson = request()->input('bricks');
-            $layout = request()->input('layout');
-            
-            // Decode JSON strings if they come from form submission
-            $blocks = is_string($blocksJson) ? json_decode($blocksJson, true) : ($blocksJson ?? []);
-            $bricks = is_string($bricksJson) ? json_decode($bricksJson, true) : ($bricksJson ?? []);
-
-            if (! is_array($blocks)) {
-                $blocks = [];
-            }
-
-            $renderer = IframeRenderer::make($blocks);
-
-            if (filled($bricks) && is_array($bricks)) {
-                // Convert string class names back to class strings if needed
-                $brickClasses = array_map(function ($brick) {
-                    if (is_string($brick) && class_exists($brick)) {
-                        return $brick;
-                    }
-                    return $brick;
-                }, $bricks);
-                
-                $renderer->bricks($brickClasses);
-            }
-
-            // Use layout from request, fallback to config
-            $layoutToUse = $layout ?? config('mason.iframe.layout');
-
-            return response($renderer->toHtml($layoutToUse))
-                ->header('Content-Type', 'text/html');
-        })->name('mason.preview')->middleware('web');
     }
 
     protected function getAssetPackageName(): ?string
