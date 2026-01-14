@@ -1,7 +1,7 @@
 <div id="mason-preview-container">
     @if(empty($blocks))
         <div class="mason-drop-zone" data-drop-index="0" style="min-height: 4rem; display: flex; align-items: center; justify-content: center; color: #9ca3af;">
-            Drop blocks here
+            {{ __('mason::mason.preview.placeholder') }}
         </div>
     @else
         <div class="mason-drop-zone" data-drop-index="0" style="min-height: 2rem;"></div>
@@ -23,6 +23,7 @@
                         data-total-blocks="{{ count($blocks) }}"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <title>{{ __('mason::mason.preview.move_up') }}</title>
                             <polyline points="18 15 12 9 6 15"></polyline>
                         </svg>
                     </button>
@@ -34,6 +35,7 @@
                         data-total-blocks="{{ count($blocks) }}"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <title>{{ __('mason::mason.preview.move_down') }}</title>
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </button>
@@ -43,6 +45,7 @@
                         data-action="edit"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                            <title>{{ __('mason::mason.preview.edit') }}</title>
                             <path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
                             <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" />
                         </svg>
@@ -53,6 +56,7 @@
                         data-action="delete"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                            <title>{{ __('mason::mason.preview.delete') }}</title>
                             <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
                         </svg>
                     </button>
@@ -73,7 +77,6 @@
         const container = document.getElementById('mason-preview-container');
         let selectedBlock = null;
         let dblClickToEdit = false;
-        let pendingSelectionIndex = null;
 
         // Listen for messages from parent
         window.addEventListener('message', function(event) {
@@ -94,23 +97,6 @@
                         dblClickToEdit = data.dblClickToEdit;
                     }
                     break;
-                case 'setParentFocus':
-                    if (data.focused) {
-                        document.body.classList.add('parent-focused');
-                        // Apply pending selection if parent is now focused
-                        if (pendingSelectionIndex !== null) {
-                            selectBlock(pendingSelectionIndex);
-                            pendingSelectionIndex = null;
-                        }
-                    } else {
-                        document.body.classList.remove('parent-focused');
-                        // Clear selection when parent loses focus
-                        if (selectedBlock) {
-                            selectedBlock.classList.remove('selected');
-                            selectedBlock = null;
-                        }
-                    }
-                    break;
                 case 'insertBlock':
                     insertBlock(data.brick, data.position);
                     break;
@@ -128,6 +114,9 @@
                     break;
                 case 'updateMoveButtons':
                     updateAllMoveButtons();
+                    break;
+                case 'deselectAllBlocks':
+                    deselectAllBlocks();
                     break;
             }
         });
@@ -178,11 +167,6 @@
         }
 
         function selectBlock(index) {
-            // Only apply selected class if parent is focused
-            if (!document.body.classList.contains('parent-focused')) {
-                return;
-            }
-
             // Remove previous selection
             if (selectedBlock) {
                 selectedBlock.classList.remove('selected');
@@ -213,6 +197,13 @@
             if (moveDownBtn) {
                 moveDownBtn.disabled = index === totalBlocks - 1;
             }
+        }
+
+        function deselectAllBlocks() {
+            container.querySelectorAll('.mason-block').forEach(block => {
+                block.classList.remove('selected');
+            });
+            selectedBlock = null;
         }
 
         // Update move buttons for all blocks on load
@@ -267,16 +258,8 @@
                     }
                 }
             } else {
-                // Click on block content - request focus and select it
+                // Click on block content - select it
                 const index = parseInt(block.getAttribute('data-block-index'));
-                // Request focus from parent
-                window.parent.postMessage({
-                    type: 'blockSelected',
-                    index
-                }, '*');
-                // Store as pending selection - will be applied when parent becomes focused
-                pendingSelectionIndex = index;
-                // Try to select immediately if parent is already focused
                 selectBlock(index);
             }
         });
@@ -480,6 +463,7 @@
                 if (dropZone) {
                     const dropIndex = parseInt(dropZone.getAttribute('data-drop-index'));
                     if (!isNaN(dropIndex)) {
+                        // Drop zone index represents insertion position in the original array
                         targetIndex = dropIndex;
                     }
                 } else if (block) {
@@ -490,14 +474,13 @@
                     }
                 }
                 
-                // Prevent dropping at the same position or immediately after the dragged block
-                if (targetIndex !== null && !isNaN(targetIndex) && targetIndex !== draggedBlockIndex && targetIndex !== draggedBlockIndex + 1) {
+                // Prevent dropping at the same position
+                if (targetIndex !== null && !isNaN(targetIndex) && targetIndex !== draggedBlockIndex) {
                     const allBlocks = container.querySelectorAll('.mason-block');
                     const totalBlocks = allBlocks.length;
                     
-                    // Send the target index as-is - handleMoveBlock will handle all adjustments
-                    // The targetIndex represents the position in the current array before removal
-                    // Special case: targetIndex === totalBlocks means "end position"
+                    // Send the target index as position in the original array
+                    // handleMoveBlock will adjust for the removal
                     if (targetIndex >= 0 && targetIndex <= totalBlocks) {
                         window.parent.postMessage({
                             type: 'moveBlockRequest',

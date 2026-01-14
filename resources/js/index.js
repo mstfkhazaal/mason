@@ -23,14 +23,12 @@ export default function masonComponent({
     let isDestroyed = false
     let previewUrl = null
     let savedScrollPosition = { x: 0, y: 0 }
-    let focusCheckInterval = null
 
     return {
         state: state,
         statePath: statePath,
         fullscreen: false,
         viewport: 'desktop',
-        isFocused: false,
         sidebarOpen: true,
         isUpdatingBrick: false,
         isInsertingBrick: false,
@@ -91,16 +89,6 @@ export default function masonComponent({
                     case 'moveBlockRequest':
                         this.handleMoveBlock(data.from, data.to)
                         break
-                    case 'blockSelected':
-                        // Set focus when a block is selected in the preview
-                        // Focus the wrapper so :focus-within works, then let tracker pick it up
-                        if (this.$el) {
-                            this.$el.focus()
-                            // The focus tracker will detect this on next check
-                            // Set it immediately to avoid delay
-                            this.isFocused = true
-                        }
-                        break
                 }
             }
 
@@ -123,22 +111,9 @@ export default function masonComponent({
                 }, 200)
             })
 
-            // Watch for focus changes and notify iframe
-            this.$watch('isFocused', (focused) => {
-                if (isDestroyed) return
-                this.sendMessageToIframe({ 
-                    type: 'setParentFocus', 
-                    focused: focused 
-                })
-            })
-
             // Handle drag and drop from sidebar
             this.setupDragAndDrop()
-
-            // Track focus state on the wrapper element
-            this.setupFocusTracking()
         },
-
 
         getBlocksFromState() {
             if (!this.state) {
@@ -187,7 +162,6 @@ export default function masonComponent({
             if (iframeContainer) {
                 iframeContainer.addEventListener('dragover', (e) => {
                     e.preventDefault()
-                    this.isFocused = true
                 })
 
                 iframeContainer.addEventListener('drop', (e) => {
@@ -202,30 +176,6 @@ export default function masonComponent({
                         this.handleInsertBlock(brickId, position)
                     }
                 })
-            }
-        },
-
-        setupFocusTracking() {
-            // Track focus on the wrapper element and its children using :focus-within
-            const wrapper = this.$el
-            
-            if (wrapper) {
-                const checkFocus = () => {
-                    if (isDestroyed) return false
-                    const hasFocus = wrapper.matches(':focus-within')
-                    if (this.isFocused !== hasFocus) {
-                        this.isFocused = hasFocus
-                    }
-                    return hasFocus
-                }
-                
-                // Check initial focus state
-                this.$nextTick(() => {
-                    checkFocus()
-                })
-                
-                // Check focus state periodically (more reliable than focus events for complex interactions)
-                focusCheckInterval = setInterval(checkFocus, 100)
             }
         },
 
@@ -299,17 +249,30 @@ export default function masonComponent({
             newBlocks.splice(from, 1)
             
             // Adjust target index after removing the block
-            // The 'to' index is in the original array before removal
+            // The 'to' index represents the target position in the original array
             // After removal, indices shift for items after 'from'
             let adjustedTo
+            
             if (to === blocks.length) {
                 // Moving to the end - insert at the end of the new array
                 adjustedTo = newBlocks.length
             } else if (to > from) {
-                // Moving down - target index shifts down by 1 because we removed an item before it
-                adjustedTo = to - 1
+                // Moving down or dragging to a position after the block
+                if (to === from + 1) {
+                    // Move down button: adjacent swap (from=0, to=1)
+                    // After removing block at 'from', insert at 'to' to swap with next block
+                    // Example: [B1(0), B2(1)] -> remove B1: [B2(0)] -> insert at 1: [B2(0), B1(1)]
+                    adjustedTo = to
+                } else {
+                    // Drag and drop: non-adjacent move (from=0, to=2+)
+                    // After removing block at 'from', the drop zone at 'to' shifts to 'to - 1'
+                    // Example: [B1(0), B2(1), B3(2)], drag B1 to drop zone 2
+                    // After removing B1: [B2(0), B3(1)]
+                    // Drop zone 2 is now at position 1, so insert at 1: [B2(0), B1(1), B3(2)]
+                    adjustedTo = to - 1
+                }
             } else {
-                // Moving up - no adjustment needed (target is before the removed item)
+                // Moving up - target is before the removed item, so no shift
                 adjustedTo = to
             }
             
@@ -475,6 +438,11 @@ export default function masonComponent({
             }, 100)
         },
 
+        deselectAllBlocks() {
+            if (this.isUpdatingBrick) return
+            this.sendMessageToIframe({ type: 'deselectAllBlocks' })
+        },
+
         destroy() {
             isDestroyed = true
 
@@ -482,11 +450,6 @@ export default function masonComponent({
                 window.removeEventListener(eventName, handler)
             })
             eventListeners = []
-
-            if (focusCheckInterval) {
-                clearInterval(focusCheckInterval)
-                focusCheckInterval = null
-            }
 
             iframe = null
         },

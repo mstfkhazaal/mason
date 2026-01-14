@@ -2,8 +2,8 @@
     .mason-input-wrapper {
         @apply overflow-hidden;
 
-        .fi-input-wrp-content-ctn {
-            @apply flex max-h-[40rem];
+        > .fi-input-wrp-content-ctn {
+            @apply flex max-h-[40rem] min-h-[20rem];
 
             .mason-editor-wrapper {
                 @apply flex-1 relative;
@@ -62,14 +62,6 @@
 
         &.sidebar-start .fi-input-wrp-input {
             @apply flex-row-reverse;
-        }
-    }
-
-    &.is-focused {
-        @apply outline-none;
-
-        .mason-input-wrapper {
-           @apply ring-2 ring-primary-500 outline-none;
         }
     }
 

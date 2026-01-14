@@ -13,7 +13,7 @@ body {
     outline: 2px dashed var(--mason-border-color, #0ea5e9);
     outline-offset: 2px;
 }
-body.parent-focused .mason-block.selected {
+.mason-block.selected {
     outline: 4px solid var(--mason-border-color, #0ea5e9);
     outline-offset: -4px;
 }
@@ -48,7 +48,7 @@ body.parent-focused .mason-block.selected {
     background: var(--mason-controls-background, rgba(0, 0, 0, 0.8));
     border-radius: 0.25rem;
 }
-body.parent-focused .mason-block.selected .mason-block-controls {
+.mason-block.selected .mason-block-controls {
     display: flex;
 }
 .mason-block-btn {

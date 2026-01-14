@@ -25,6 +25,7 @@ class IframeRenderer
     public function __construct(array $blocks = [])
     {
         $this->blocks = $blocks;
+        app('debugbar')->disable();
     }
 
     /**

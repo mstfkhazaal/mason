@@ -6,7 +6,7 @@
     $brickIds = array_map(fn ($brick) => $brick::getLabel(), $bricks);
 @endphp
 
-<div class="mason-sidebar">
+<div class="mason-sidebar" {{ $attributes }}>
     <div class="mason-controls">
         <x-filament::icon-button
             color="gray"

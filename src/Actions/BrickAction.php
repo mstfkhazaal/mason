@@ -16,6 +16,15 @@ class BrickAction
     public static function make(): Action
     {
         return Action::make(static::NAME)
+            ->bootUsing(function (Action $action, array $arguments, Mason $component): ?Action {
+                $brick = $component->getBrick($arguments['id']);
+
+                if (blank($brick)) {
+                    return null;
+                }
+
+                return $brick::configureBrickAction($action);
+            })
             ->fillForm(fn (array $arguments): ?array => $arguments['config'] ?? null)
             ->modalHeading(function (array $arguments, Mason $component) {
                 $brick = $component->getBrick($arguments['id']);
@@ -31,15 +40,6 @@ class BrickAction
                 'insert' => __('mason::mason.actions.brick.modal.actions.insert.label'),
                 'edit' => __('mason::mason.actions.brick.modal.actions.save.label'),
                 default => null,
-            })
-            ->bootUsing(function (Action $action, array $arguments, Mason $component) {
-                $brick = $component->getBrick($arguments['id']);
-
-                if (blank($brick)) {
-                    return;
-                }
-
-                return $brick::configureBrickAction($action);
             })
             ->action(function (array $arguments, array $data, Mason $component): void {
                 $brick = $component->getBrick($arguments['id']);
@@ -60,7 +60,7 @@ class BrickAction
 
                 $mode = $arguments['mode'] ?? 'insert';
                 $state = $component->getState() ?? [];
-                
+
                 if (! is_array($state)) {
                     $state = [];
                 }

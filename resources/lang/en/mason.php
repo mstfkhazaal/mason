@@ -20,4 +20,11 @@ return [
             ],
         ],
     ],
+    'preview' => [
+        'placeholder' => 'Drop blocks here',
+        'move_up' => 'Move Up',
+        'move_down' => 'Move Down',
+        'edit' => 'Edit',
+        'delete' => 'Delete',
+    ]
 ];

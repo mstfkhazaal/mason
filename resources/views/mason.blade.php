@@ -37,12 +37,12 @@
         tabindex="-1"
         x-bind:class="{
             'fullscreen': fullscreen,
-            'is-focused': isFocused,
             'display-mobile': viewport === 'mobile',
             'display-tablet': viewport === 'tablet',
             'display-desktop': viewport === 'desktop'
         }"
         x-on:keydown.escape.window="fullscreen = false"
+        x-on:click.away="deselectAllBlocks()"
     >
         <x-filament::input.wrapper
             :valid="! $errors->has($statePath)"
@@ -71,9 +71,7 @@
                 </div>
 
                 @if (! $isDisabled && filled($bricks))
-                    <div wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}">
-                        <x-mason::sidebar :bricks="$bricks" />
-                    </div>
+                    <x-mason::sidebar :bricks="$bricks" wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}" />
                 @endif
             </div>
         </x-filament::input.wrapper>
