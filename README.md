@@ -6,7 +6,7 @@
 
 # Mason
 
-A simple block based drag and drop page / document builder field for Filament.
+A simple block-based drag and drop page / document builder field for Filament.
 
 ## Compatibility
 
@@ -15,6 +15,7 @@ A simple block based drag and drop page / document builder field for Filament.
 | 0.x             | 3.x              |
 | 1.x             | 4.x              |
 | 2.x             | 5.x              |
+| 3.x             | 4.x, 5.x         |
 
 ## Installation
 
@@ -24,12 +25,12 @@ You can install the package via composer:
 composer require awcodes/mason
 ```
 
-In an effort to align with Filament's theming methodology you will need to use a custom theme to use this plugin.
+In an effort to align with Filament's theming methodology, you will need to use a custom theme to use this plugin.
 
 > [!IMPORTANT]
-> If you have not set up a custom theme and are using Filament Panels follow the instructions in the [Filament Docs](https://filamentphp.com/docs/4.x/styling/overview#creating-a-custom-theme) first. The following applies to both the Panels Package and the standalone Tables package.
+> If you have not set up a custom theme and are using Filament Panels, follow the instructions in the [Filament Docs](https://filamentphp.com/docs/5.x/styling/overview#creating-a-custom-theme) first. The following applies to both the Panels Package and the standalone Tables package.
 
-After setting up a custom theme add the plugin's css to your theme css file or your app's css file if using the standalone forms package.
+After setting up a custom theme, add the plugin's CSS to your theme CSS file or your app's CSS file if using the standalone forms package.
 
 ```css
 @import '../../../../vendor/awcodes/mason/resources/css/plugin.css';
@@ -45,7 +46,7 @@ You can publish the config file with:
 php artisan vendor:publish --tag="mason-config"
 ```
 
-This is the contents of the published config file:
+These are the contents of the published config file:
 
 ```php
 return [
@@ -53,16 +54,16 @@ return [
         'namespace' => 'App\\Mason',
         'views_path' => 'mason',
     ],
+    'preview' => [
+        'layout' => 'mason::iframe-preview',
+    ],
 ];
 ```
 
 ## Usage
 
 > [!IMPORTANT]
-> Since Mason uses json to store its data in the database you will need to make sure your model's field is cast to 'array' or 'json'.
-
-> [!WARNING]
-> Due to an issue with Livewire and full page components, at the moment any Bricks that have Livewire components rendered in a blade view will not work properly inside the editor when loading a resource for editing. The only workaround at the moment is to have a dedicated preview blade that does not use either the `@livewire` or `<livewire:` directives. This only affects the editor view. The front end rendering will work as expected.
+> Mason uses JSON to store its data in the database, so it is important that you cast the field to either 'array' or 'json' on your model and recommend to store the content as a `longText` column in the database.
 
 ### Form Field
 
@@ -76,11 +77,73 @@ use Awcodes\Mason\Bricks\Section;
     Mason::make('content')
         ->bricks([
             Section::class,
-        ])
-        // optional
-        ->placeholder('Drag and drop bricks to get started...')
-        ->doubleClickToEdit(),
+        ]),
 ])
+```
+
+#### Field Preview Layout
+
+Since Mason uses an iframe to render in the editor, you should set the preview layout for the field to a view in your application that includes your app's styles. This will ensure that the content in the editor looks similar to how it will look on the front end of your site. If all Mason fields in your forms use the same layout, you can set a default in the config file. Otherwise, you can set it per field like so:
+
+```php
+Mason::make('content')
+    ->previewLayout('layouts.app') // your app's layout
+    ->bricks([
+        Section::class,
+    ])
+```
+
+Then in your layout file you can include the necessary styles and include to render the content correctly.
+
+```blade
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>{{ config('app.name') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+
+        <!-- Styles / Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Mason Styles -->
+        @masonStyles 
+    </head>
+    <body>
+        <main>
+            <!-- Include Mason content rendering -->
+            @include('mason::iframe-preview-content', ['blocks' => $blocks])
+        </main>
+    </body>
+</html>
+```
+
+If the blue color used in the editor doesn't work with your design, you can customize it with CSS in your app's CSS file.
+
+```css
+#mason-preview-container {
+    --mason-border-color: var(--color-primary-500, #0ea5e9);
+    --mason-controls-background: rgba(0, 0, 0, 0.8);
+    --mason-button-hover-background: rgba(255, 255, 255, 0.2);
+    --mason-dropzone-background: rgba(14, 165, 233, 0.1);
+}
+```
+
+#### Double-Clicking Bricks to Edit
+
+By default, Mason requires you to click the edit button on each brick to edit its content. If you would like to enable double-clicking on bricks to open the edit modal, you can chain the `doubleClickToEdit` method on the field.
+
+```php
+Mason::make('content')
+    ->doubleClickToEdit()
+    ->bricks([
+        Section::class,
+    ])
 ```
 
 ### Infolist Entry
@@ -99,7 +162,9 @@ use Awcodes\Mason\Bricks\Section;
 ])            
 ```
 
-To keep from having to repeat yourself when assigning bricks to the editor and the entry it would help to create sets of bricks that make sense for their use case. Then you can just use that in the `bricks` method.
+### Brick Collections
+
+To keep from having to repeat yourself when assigning bricks to the editor and the entry, it would help to create sets of bricks that make sense for their use case. Then you can use that in the `bricks` method.
 
 ```php
 class BrickCollection
@@ -126,7 +191,7 @@ MasonEntry::make('content')
 
 Bricks are nothing more than Filament actions that have an associated view that is rendered in the editor with its data.
 
-To help you get started there is a `make:mason-brick` command that will create a new brick for you with the necessary class and blade template in the paths specified in the config file.
+To help you get started, there is a `make:mason-brick` command that will create a new brick for you with the necessary class and blade template in the paths specified in the config file.
 
 ```bash
 php artisan make:mason-brick Section
@@ -160,11 +225,6 @@ class Section extends Brick
         return parent::getLabel();
     }
 
-    public static function getPreviewLabel(array $config): string
-    {
-        return static::getLabel();
-    }
-
     public static function getIcon(): string | Heroicon | Htmlable | null
     {
         return new HtmlString('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 20h.01M4 20h.01M8 20h.01M12 20h.01M16 20h.01M20 4h.01M4 4h.01M8 4h.01M12 4h.01M16 4v.01M4 9a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/></svg>');
@@ -173,15 +233,7 @@ class Section extends Brick
     /**
      * @throws Throwable
      */
-    public static function toPreviewHtml(array $config): ?string
-    {
-        return static::toHtml($config, []);
-    }
-
-    /**
-     * @throws Throwable
-     */
-    public static function toHtml(array $config, array $data): ?string
+    public static function toHtml(array $config, ?array $data = null): ?string
     {
         return view('mason::bricks.section.index', [
             'background_color' => $config['background_color'] ?? 'white',
@@ -205,9 +257,9 @@ class Section extends Brick
 
 ## Rendering Content
 
-You are free to render the content however you see fit. The data is stored in the database as json so you can use the data however you see fit. But the plugin offers a helper method for converting the data to html should you choose to use it.
+You are free to render the content however you see fit. The data is stored in the database as JSON, so you can use the data however you see fit. But the plugin offers a helper method for converting the data to HTML should you choose to use it.
 
-Similar to the form field and entry components the helper needs to know what bricks are available. You can pass the bricks to the helper as the second argument. See, above about creating a collection of bricks. This will help keep your code DRY.
+Similar to the form field and entry components, the helper needs to know what bricks are available. You can pass the bricks to the helper as the second argument. See, above about creating a collection of bricks. This will help keep your code DRY.
 
 ```php
 {!! mason(content: $post->content, bricks: \App\Mason\BrickCollection::make())->toHtml() !!}
@@ -228,7 +280,7 @@ $renderer->toText();
 
 ## Faking Content
 
-When testing you may want to fake some Mason content. There is a helper method for that as well.
+When testing, you may want to fake some Mason content. There is a helper method for that as well.
 
 ```php
 use Awcodes\Mason\Support\Faker;
@@ -258,10 +310,6 @@ Faker::make()
 ```bash
 composer test
 ```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Contributing
 

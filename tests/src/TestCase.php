@@ -42,11 +42,6 @@ class TestCase extends Orchestra
             ...$app['config']->get('view.paths'),
             __DIR__ . '/../resources/views',
         ]);
-
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_filament-extras_table.php.stub';
-        $migration->up();
-        */
     }
 
     protected function getPackageProviders($app): array
