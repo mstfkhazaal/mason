@@ -7,7 +7,7 @@ namespace Awcodes\Mason;
 use Awcodes\Mason\Actions\BrickAction;
 use Awcodes\Mason\Concerns\HasBricks;
 use Awcodes\Mason\Concerns\HasSidebar;
-use Awcodes\Mason\Support\BlockCommand;
+use Awcodes\Mason\Support\BrickCommand;
 use Closure;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Contracts\CanBeLengthConstrained;
@@ -42,7 +42,7 @@ class Mason extends Field implements CanBeLengthConstrained
                 return null;
             }
 
-            // Ensure state is an array
+            // Ensure the state is an array
             if (! is_array($state)) {
                 $state = [];
             }
@@ -58,7 +58,7 @@ class Mason extends Field implements CanBeLengthConstrained
             $livewire->validateOnly($component->getStatePath());
         });
 
-        $this->dehydrateStateUsing(function ($state) {
+        $this->dehydrateStateUsing(function ($state): ?array {
             if (! $state || ! is_array($state)) {
                 return null;
             }
@@ -85,28 +85,9 @@ class Mason extends Field implements CanBeLengthConstrained
     }
 
     /**
-     * @param  array<BlockCommand>  $commands
-     */
-    public function runCommands(array $commands): void
-    {
-        $key = $this->getKey();
-        $livewire = $this->getLivewire();
-
-        /** @phpstan-ignore-next-line  */
-        $livewire->dispatch(
-            event: 'run-mason-commands',
-            awaitMasonComponent: $key,
-            /** @phpstan-ignore-next-line  */
-            livewireId: $livewire->getId(),
-            key: $key,
-            commands: array_map(fn (BlockCommand $command): array => $command->toArray(), $commands),
-        );
-    }
-
-    /**
      * Execute block commands on the current state
      *
-     * @param  array<BlockCommand>  $commands
+     * @param  array<BrickCommand>  $commands
      * @return array<int, array<string, mixed>>
      */
     public function executeCommands(array $commands): array
@@ -119,91 +100,15 @@ class Mason extends Field implements CanBeLengthConstrained
 
         foreach ($commands as $command) {
             $state = match ($command->name) {
-                'insertBlock' => $this->executeInsertBlock($state, $command->arguments),
-                'updateBlock' => $this->executeUpdateBlock($state, $command->arguments),
-                'deleteBlock' => $this->executeDeleteBlock($state, $command->arguments),
-                'moveBlock' => $this->executeMoveBlock($state, $command->arguments),
+                'insertBrick' => $this->executeInsertBrick($state, $command->arguments),
+                'updateBrick' => $this->executeUpdateBrick($state, $command->arguments),
+                'deleteBrick' => $this->executeDeleteBrick($state, $command->arguments),
+                'moveBrick' => $this->executeMoveBrick($state, $command->arguments),
                 default => $state,
             };
         }
 
         $this->state($state);
-
-        return $state;
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $state
-     * @param  array<string, mixed>  $arguments
-     * @return array<int, array<string, mixed>>
-     */
-    protected function executeInsertBlock(array $state, array $arguments): array
-    {
-        $brick = $arguments['brick'] ?? null;
-        $position = $arguments['position'] ?? count($state);
-
-        if (! $brick) {
-            return $state;
-        }
-
-        array_splice($state, $position, 0, [$brick]);
-
-        return $state;
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $state
-     * @param  array<string, mixed>  $arguments
-     * @return array<int, array<string, mixed>>
-     */
-    protected function executeUpdateBlock(array $state, array $arguments): array
-    {
-        $index = $arguments['index'] ?? null;
-        $brick = $arguments['brick'] ?? null;
-
-        if ($index === null || ! isset($state[$index]) || ! $brick) {
-            return $state;
-        }
-
-        $state[$index] = $brick;
-
-        return $state;
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $state
-     * @param  array<string, mixed>  $arguments
-     * @return array<int, array<string, mixed>>
-     */
-    protected function executeDeleteBlock(array $state, array $arguments): array
-    {
-        $index = $arguments['index'] ?? null;
-
-        if ($index === null || ! isset($state[$index])) {
-            return $state;
-        }
-
-        array_splice($state, $index, 1);
-
-        return $state;
-    }
-
-    /**
-     * @param  array<int, array<string, mixed>>  $state
-     * @param  array<string, mixed>  $arguments
-     * @return array<int, array<string, mixed>>
-     */
-    protected function executeMoveBlock(array $state, array $arguments): array
-    {
-        $from = $arguments['from'] ?? null;
-        $to = $arguments['to'] ?? null;
-
-        if ($from === null || $to === null || ! isset($state[$from])) {
-            return $state;
-        }
-
-        $moved = array_splice($state, $from, 1);
-        array_splice($state, $to, 0, $moved);
 
         return $state;
     }
@@ -230,5 +135,81 @@ class Mason extends Field implements CanBeLengthConstrained
     public function getPreviewLayout(): ?string
     {
         return $this->evaluate($this->previewLayout) ?? config('mason.preview.layout');
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $state
+     * @param  array<string, mixed>  $arguments
+     * @return array<int, array<string, mixed>>
+     */
+    protected function executeInsertBrick(array $state, array $arguments): array
+    {
+        $brick = $arguments['brick'] ?? null;
+        $position = $arguments['position'] ?? count($state);
+
+        if (! $brick) {
+            return $state;
+        }
+
+        array_splice($state, $position, 0, [$brick]);
+
+        return $state;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $state
+     * @param  array<string, mixed>  $arguments
+     * @return array<int, array<string, mixed>>
+     */
+    protected function executeUpdateBrick(array $state, array $arguments): array
+    {
+        $index = $arguments['index'] ?? null;
+        $brick = $arguments['brick'] ?? null;
+
+        if ($index === null || ! isset($state[$index]) || ! $brick) {
+            return $state;
+        }
+
+        $state[$index] = $brick;
+
+        return $state;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $state
+     * @param  array<string, mixed>  $arguments
+     * @return array<int, array<string, mixed>>
+     */
+    protected function executeDeleteBrick(array $state, array $arguments): array
+    {
+        $index = $arguments['index'] ?? null;
+
+        if ($index === null || ! isset($state[$index])) {
+            return $state;
+        }
+
+        array_splice($state, $index, 1);
+
+        return $state;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $state
+     * @param  array<string, mixed>  $arguments
+     * @return array<int, array<string, mixed>>
+     */
+    protected function executeMoveBrick(array $state, array $arguments): array
+    {
+        $from = $arguments['from'] ?? null;
+        $to = $arguments['to'] ?? null;
+
+        if ($from === null || $to === null || ! isset($state[$from])) {
+            return $state;
+        }
+
+        $moved = array_splice($state, $from, 1);
+        array_splice($state, $to, 0, $moved);
+
+        return $state;
     }
 }

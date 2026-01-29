@@ -34,7 +34,7 @@ Route::post('/mason/preview', function () {
         $renderer->bricks($brickClasses);
     }
 
-    // Use layout from request, fallback to config
+    // Use layout from the request, fallback to config
     $layoutToUse = $layout ?? config('mason.iframe.layout');
 
     return response($renderer->toHtml($layoutToUse))

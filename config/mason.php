@@ -8,6 +8,6 @@ return [
         'views_path' => 'mason',
     ],
     'preview' => [
-        'layout' => null, // Set to your layout view path, e.g., 'layouts.preview'
+        'layout' => 'mason::iframe-preview', // Set to your layout view path, e.g., 'layouts.preview'
     ],
 ];

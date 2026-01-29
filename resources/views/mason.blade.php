@@ -24,10 +24,7 @@
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
             statePath: @js($statePath),
             placeholder: @js($getPlaceholder()),
-            isDisabled: @js($isDisabled),
-            isLiveDebounced: @js($isLiveDebounced()),
-            isLiveOnBlur: @js($isLiveOnBlur()),
-            liveDebounce: @js($getLiveDebounce()),
+            disabled: @js($isDisabled),
             dblClickToEdit: @js($shouldDblClickToEdit()),
             bricks: @js(array_map(fn($brick) => is_string($brick) ? $brick : get_class($brick), $bricks)),
             previewLayout: @js($getPreviewLayout()),
@@ -50,7 +47,6 @@
                 \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
                     ->class([
                         'mason-input-wrapper',
-
                     ])
             "
         >
@@ -60,13 +56,19 @@
                     'flex-row-reverse' => $getSidebarPosition() === \Awcodes\Mason\Enums\SidebarPosition::Start,
                 ])
             >
-                <div class="mason-editor-wrapper">
+                <div class="mason-editor-wrapper"
+                    {{
+                        \Filament\Support\prepare_inherited_attributes($getExtraInputAttributeBag())
+                            ->class([
+                                'mason-input-wrapper',
+                            ])
+                    }}
+                >
                     <iframe
                         x-ref="previewIframe"
                         name="mason-preview-iframe"
                         class="mason-iframe"
                         wire:ignore
-                        style="width: 100%; height: 100%; border: none;"
                     ></iframe>
                 </div>
 

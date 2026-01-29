@@ -6,8 +6,8 @@
     @else
         <div class="mason-drop-zone" data-drop-index="0" style="min-height: 2rem;"></div>
         @foreach($blocks as $block)
-            <div 
-                class="mason-block" 
+            <div
+                class="mason-block"
                 draggable="true"
                 data-block-index="{{ $block['index'] }}"
                 data-brick-id="{{ $block['id'] }}"
@@ -15,8 +15,8 @@
                 data-total-blocks="{{ count($blocks) }}"
             >
                 <div class="mason-block-controls">
-                    <button 
-                        class="mason-block-btn" 
+                    <button
+                        class="mason-block-btn"
                         title="Move Up"
                         data-action="move-up"
                         data-block-index="{{ $block['index'] }}"
@@ -27,8 +27,8 @@
                             <polyline points="18 15 12 9 6 15"></polyline>
                         </svg>
                     </button>
-                    <button 
-                        class="mason-block-btn" 
+                    <button
+                        class="mason-block-btn"
                         title="Move Down"
                         data-action="move-down"
                         data-block-index="{{ $block['index'] }}"
@@ -39,8 +39,8 @@
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </button>
-                    <button 
-                        class="mason-block-btn" 
+                    <button
+                        class="mason-block-btn"
                         title="Edit"
                         data-action="edit"
                     >
@@ -50,8 +50,8 @@
                             <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" />
                         </svg>
                     </button>
-                    <button 
-                        class="mason-block-btn" 
+                    <button
+                        class="mason-block-btn"
                         title="Delete"
                         data-action="delete"
                     >
@@ -77,6 +77,7 @@
         const container = document.getElementById('mason-preview-container');
         let selectedBlock = null;
         let dblClickToEdit = false;
+        let isDisabled = false;
 
         // Listen for messages from parent
         window.addEventListener('message', function(event) {
@@ -90,12 +91,17 @@
                     if (data.dblClickToEdit !== undefined) {
                         dblClickToEdit = data.dblClickToEdit;
                     }
+
+                    shouldBeDisabled(data)
+
                     updateContent(data.blocks);
                     break;
                 case 'setConfig':
                     if (data.dblClickToEdit !== undefined) {
                         dblClickToEdit = data.dblClickToEdit;
                     }
+
+                    shouldBeDisabled(data)
                     break;
                 case 'insertBlock':
                     insertBlock(data.brick, data.position);
@@ -135,34 +141,46 @@
             setTimeout(updateAllMoveButtons, 100);
         }
 
+        function shouldBeDisabled(data) {
+            if (data.disabled !== undefined) {
+                isDisabled = data.disabled;
+            }
+
+            if (isDisabled) {
+                container.style.pointerEvents = 'none';
+            } else {
+                container.style.pointerEvents = '';
+            }
+        }
+
         function insertBlock(brick, position) {
-            window.parent.postMessage({ 
-                type: 'insertBlockRequest', 
-                brick, 
-                position 
+            window.parent.postMessage({
+                type: 'insertBlockRequest',
+                brick,
+                position
             }, '*');
         }
 
         function updateBlock(index, brick) {
-            window.parent.postMessage({ 
-                type: 'updateBlockRequest', 
-                index, 
-                brick 
+            window.parent.postMessage({
+                type: 'updateBlockRequest',
+                index,
+                brick
             }, '*');
         }
 
         function deleteBlock(index) {
-            window.parent.postMessage({ 
-                type: 'deleteBlockRequest', 
-                index 
+            window.parent.postMessage({
+                type: 'deleteBlockRequest',
+                index
             }, '*');
         }
 
         function moveBlock(from, to) {
-            window.parent.postMessage({ 
-                type: 'moveBlockRequest', 
-                from, 
-                to 
+            window.parent.postMessage({
+                type: 'moveBlockRequest',
+                from,
+                to
             }, '*');
         }
 
@@ -182,18 +200,18 @@
 
         function updateMoveButtons(block) {
             if (!block) return;
-            
+
             const index = parseInt(block.getAttribute('data-block-index'));
             const allBlocks = container.querySelectorAll('.mason-block');
             const totalBlocks = allBlocks.length;
-            
+
             const moveUpBtn = block.querySelector('[data-action="move-up"]');
             const moveDownBtn = block.querySelector('[data-action="move-down"]');
-            
+
             if (moveUpBtn) {
                 moveUpBtn.disabled = index === 0;
             }
-            
+
             if (moveDownBtn) {
                 moveDownBtn.disabled = index === totalBlocks - 1;
             }
@@ -317,19 +335,19 @@
 
             draggedBlock = block;
             draggedBlockIndex = parseInt(block.getAttribute('data-block-index'));
-            
+
             if (isNaN(draggedBlockIndex)) {
                 return;
             }
-            
+
             block.classList.add('dragging');
-            
+
             // Disable all interactions during drag
             document.body.style.userSelect = 'none';
             document.body.style.webkitUserSelect = 'none';
             document.body.style.mozUserSelect = 'none';
             document.body.style.msUserSelect = 'none';
-            
+
             // Disable pointer events on all content inside the block
             const blockContent = block.querySelector('.mason-block-content');
             if (blockContent) {
@@ -339,7 +357,7 @@
                 blockContent.style.mozUserSelect = 'none';
                 blockContent.style.msUserSelect = 'none';
             }
-            
+
             // Set drag data
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', draggedBlockIndex.toString());
@@ -351,7 +369,7 @@
             document.body.style.webkitUserSelect = '';
             document.body.style.mozUserSelect = '';
             document.body.style.msUserSelect = '';
-            
+
             if (draggedBlock) {
                 draggedBlock.classList.remove('dragging');
                 const blockContent = draggedBlock.querySelector('.mason-block-content');
@@ -363,7 +381,7 @@
                     blockContent.style.msUserSelect = '';
                 }
             }
-            
+
             // Clear all active drop zones and outlines
             container.querySelectorAll('.mason-drop-zone.active').forEach(zone => {
                 zone.classList.remove('active');
@@ -372,7 +390,7 @@
                 block.style.outline = '';
                 block.style.outlineOffset = '';
             });
-            
+
             draggedBlock = null;
             draggedBlockIndex = null;
             dragOverIndex = null;
@@ -381,21 +399,21 @@
         // Handle drag over for drop zones (inserting new blocks from sidebar)
         container.addEventListener('dragover', function(e) {
             e.preventDefault();
-            
+
             // Check if this is a block being repositioned
             if (draggedBlockIndex !== null) {
                 // Handle block repositioning
                 const dropZone = e.target.closest('.mason-drop-zone');
                 const block = e.target.closest('.mason-block');
-                
+
                 if (dropZone) {
                     // Clear all active zones
                     container.querySelectorAll('.mason-drop-zone.active').forEach(zone => {
                         zone.classList.remove('active');
                     });
-                    
+
                     const targetIndex = parseInt(dropZone.getAttribute('data-drop-index'));
-                    
+
                     // Don't highlight if dropping at same position or immediately after
                     // Allow dropping at index 0 (before first block)
                     if (!isNaN(targetIndex) && targetIndex !== draggedBlockIndex && targetIndex !== draggedBlockIndex + 1) {
@@ -423,11 +441,11 @@
         container.addEventListener('dragleave', function(e) {
             const dropZone = e.target.closest('.mason-drop-zone');
             const block = e.target.closest('.mason-block');
-            
+
             if (dropZone) {
                 dropZone.classList.remove('active');
             }
-            
+
             if (block && draggedBlockIndex !== null) {
                 block.style.outline = '';
                 block.style.outlineOffset = '';
@@ -437,7 +455,7 @@
         container.addEventListener('drop', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
+
             // Clear all active zones and outlines
             container.querySelectorAll('.mason-drop-zone.active').forEach(zone => {
                 zone.classList.remove('active');
@@ -446,7 +464,7 @@
                 block.style.outline = '';
                 block.style.outlineOffset = '';
             });
-            
+
             if (draggedBlockIndex !== null) {
                 // Handle block repositioning
                 // Try to find drop zone first (more precise)
@@ -455,11 +473,11 @@
                 if (!dropZone && e.target.classList.contains('mason-drop-zone')) {
                     dropZone = e.target;
                 }
-                
+
                 const block = e.target.closest('.mason-block');
-                
+
                 let targetIndex = null;
-                
+
                 if (dropZone) {
                     const dropIndex = parseInt(dropZone.getAttribute('data-drop-index'));
                     if (!isNaN(dropIndex)) {
@@ -473,12 +491,12 @@
                         targetIndex = blockIndex + 1;
                     }
                 }
-                
+
                 // Prevent dropping at the same position
                 if (targetIndex !== null && !isNaN(targetIndex) && targetIndex !== draggedBlockIndex) {
                     const allBlocks = container.querySelectorAll('.mason-block');
                     const totalBlocks = allBlocks.length;
-                    
+
                     // Send the target index as position in the original array
                     // handleMoveBlock will adjust for the removal
                     if (targetIndex >= 0 && targetIndex <= totalBlocks) {
@@ -489,7 +507,7 @@
                         }, '*');
                     }
                 }
-                
+
                 // Reset drag state
                 draggedBlockIndex = null;
                 draggedBlock = null;
@@ -499,7 +517,7 @@
                 if (dropZone) {
                     const position = parseInt(dropZone.getAttribute('data-drop-index'));
                     const brickId = e.dataTransfer.getData('brick');
-                    
+
                     if (brickId && !isNaN(position)) {
                         window.parent.postMessage({
                             type: 'insertBlockRequest',

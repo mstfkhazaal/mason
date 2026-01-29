@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Awcodes\Mason\Support;
 
-use Awcodes\Mason\Brick;
 use Awcodes\Mason\Concerns\HasBricks;
 use Filament\Support\Concerns\EvaluatesClosures;
-use Illuminate\Contracts\Support\Htmlable;
 
 class IframeRenderer
 {
@@ -15,16 +13,10 @@ class IframeRenderer
     use HasBricks;
 
     /**
-     * @var array<int, array<string, mixed>>
-     */
-    protected array $blocks = [];
-
-    /**
      * @param  array<int, array<string, mixed>>  $blocks
      */
-    public function __construct(array $blocks = [])
+    public function __construct(protected array $blocks = [])
     {
-        $this->blocks = $blocks;
         app('debugbar')->disable();
     }
 
@@ -74,7 +66,7 @@ class IframeRenderer
 
         foreach ($this->getBricks() as $brick) {
             if (is_string($brick) && ($brick::getId() === $id)) {
-                return $brick::toPreviewHtml($config);
+                return $brick::toHtml($config);
             }
         }
 
@@ -83,8 +75,6 @@ class IframeRenderer
 
     /**
      * Render the full iframe HTML document
-     *
-     * @param  string|null  $layout
      */
     public function toHtml(?string $layout = null): string
     {
@@ -98,11 +88,11 @@ class IframeRenderer
                 'id' => $id,
                 'config' => $config,
                 'html' => $html,
-                'label' => $this->getBlockLabel($id, $config),
+                'label' => $this->getBlockLabel($id),
             ];
         }, $this->blocks, array_keys($this->blocks));
 
-        // Use provided layout, fallback to config, then default
+        // Use the provided layout, fallback to config, then default
         $layoutToUse = $layout ?? config('mason.iframe.layout');
 
         // If a layout is configured, use it with the preview content slotted in
@@ -121,7 +111,7 @@ class IframeRenderer
     /**
      * Get the label for a block
      */
-    protected function getBlockLabel(?string $id, array $config): string
+    protected function getBlockLabel(?string $id): string
     {
         if (blank($id)) {
             return 'Unknown Brick';
@@ -129,7 +119,7 @@ class IframeRenderer
 
         foreach ($this->getBricks() as $brick) {
             if (is_string($brick) && ($brick::getId() === $id)) {
-                return $brick::getPreviewLabel($config);
+                return $brick::getLabel();
             }
         }
 

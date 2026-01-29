@@ -32,15 +32,7 @@ class Section extends Brick
     /**
      * @throws Throwable
      */
-    public static function toPreviewHtml(array $config): ?string
-    {
-        return static::toHtml($config, []);
-    }
-
-    /**
-     * @throws Throwable
-     */
-    public static function toHtml(array $config, array $data): ?string
+    public static function toHtml(array $config, ?array $data = null): ?string
     {
         return view('mason::bricks.section.index', [
             'background_color' => $config['background_color'] ?? 'white',

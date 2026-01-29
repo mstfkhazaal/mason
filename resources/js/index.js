@@ -1,27 +1,15 @@
 export default function masonComponent({
     key,
-    livewireId,
     state,
     statePath,
-    placeholder = null,
-    isDisabled,
-    isLiveDebounced,
-    isLiveOnBlur,
-    liveDebounce,
+    disabled,
     dblClickToEdit,
-    deleteBrickButtonIconHtml,
-    editBrickButtonIconHtml,
-    insertAboveBrickButtonIconHtml,
-    insertBelowBrickButtonIconHtml,
-    moveBrickUpButtonIconHtml,
-    moveBrickDownButtonIconHtml,
     bricks = [],
     previewLayout = null,
 }) {
     let iframe = null
     let eventListeners = []
     let isDestroyed = false
-    let previewUrl = null
     let savedScrollPosition = { x: 0, y: 0 }
 
     return {
@@ -43,18 +31,19 @@ export default function masonComponent({
                 if (iframe) {
                     // Load initial content via form submission
                     this.updatePreview()
-                    
+
                     iframe.addEventListener('load', () => {
                         // Restore scroll position after iframe loads
                         this.restoreScrollPosition()
-                        
-                        // Send postMessage once iframe is loaded with config
-                        this.sendMessageToIframe({ 
-                            type: 'setContent', 
+
+                        // Send postMessage once the iframe is loaded with config
+                        this.sendMessageToIframe({
+                            type: 'setContent',
                             blocks: this.getBlocksFromState(),
-                            dblClickToEdit: dblClickToEdit
+                            dblClickToEdit: dblClickToEdit,
+                            disabled: disabled,
                         })
-                        
+
                         // Update move buttons after iframe loads
                         setTimeout(() => {
                             this.sendMessageToIframe({ type: 'updateMoveButtons' })
@@ -111,7 +100,7 @@ export default function masonComponent({
                 }, 200)
             })
 
-            // Handle drag and drop from sidebar
+            // Handle drag and drop from the sidebar
             this.setupDragAndDrop()
         },
 
@@ -120,10 +109,10 @@ export default function masonComponent({
                 return []
             }
 
-            // Convert Proxy to plain array to avoid cloning issues
+            // Convert Proxy to a plain array to avoid cloning issues
             let stateArray = []
             try {
-                // Use JSON parse/stringify to convert Proxy to plain object
+                // Use JSON parse/stringify to convert Proxy to a plain object
                 stateArray = JSON.parse(JSON.stringify(this.state))
             } catch (e) {
                 // Fallback: try to convert manually
@@ -148,9 +137,10 @@ export default function masonComponent({
         updateIframeContent() {
             this.updatePreview()
             // Also send config update to iframe
-            this.sendMessageToIframe({ 
+            this.sendMessageToIframe({
                 type: 'setConfig',
-                dblClickToEdit: dblClickToEdit
+                dblClickToEdit: dblClickToEdit,
+                disabled: disabled
             })
         },
 
@@ -158,7 +148,7 @@ export default function masonComponent({
             // The sidebar already has draggable="true" and dragstart handler
             // We just need to handle the drop on the iframe
             const iframeContainer = this.$el.querySelector('.mason-editor-wrapper')
-            
+
             if (iframeContainer) {
                 iframeContainer.addEventListener('dragover', (e) => {
                     e.preventDefault()
@@ -167,12 +157,12 @@ export default function masonComponent({
                 iframeContainer.addEventListener('drop', (e) => {
                     e.preventDefault()
                     const brickId = e.dataTransfer.getData('brick')
-                    
+
                     if (brickId) {
                         // Calculate drop position (we'll insert at the end for now)
                         const blocks = this.getBlocksFromState()
                         const position = blocks.length
-                        
+
                         this.handleInsertBlock(brickId, position)
                     }
                 })
@@ -214,45 +204,45 @@ export default function masonComponent({
 
         handleDeleteBlock(index) {
             const blocks = this.getBlocksFromState()
-            
+
             if (index >= 0 && index < blocks.length) {
                 // Create a new array without the deleted block
                 const newBlocks = blocks.filter((_, i) => i !== index)
-                
+
                 this.updateStateFromBlocks(newBlocks)
             }
         },
 
         handleUpdateBlock(index, brick) {
             const blocks = this.getBlocksFromState()
-            
+
             if (index >= 0 && index < blocks.length) {
                 // Create a new array with the updated block
                 const newBlocks = blocks.map((block, i) => i === index ? brick : block)
-                
+
                 this.updateStateFromBlocks(newBlocks)
             }
         },
 
         handleMoveBlock(from, to) {
             const blocks = this.getBlocksFromState()
-            
+
             // Validate indices
             if (from < 0 || from >= blocks.length) return
             // Allow to be up to blocks.length (for moving to the end)
             if (to < 0 || to > blocks.length) return
             if (from === to) return
-            
+
             // Create a new array with moved block (blocks are already plain from getBlocksFromState)
             const newBlocks = blocks.slice() // Use slice instead of spread for safety
             const moved = newBlocks[from]
             newBlocks.splice(from, 1)
-            
+
             // Adjust target index after removing the block
             // The 'to' index represents the target position in the original array
             // After removal, indices shift for items after 'from'
             let adjustedTo
-            
+
             if (to === blocks.length) {
                 // Moving to the end - insert at the end of the new array
                 adjustedTo = newBlocks.length
@@ -275,14 +265,14 @@ export default function masonComponent({
                 // Moving up - target is before the removed item, so no shift
                 adjustedTo = to
             }
-            
+
             // Clamp to valid range (0 to newBlocks.length)
             adjustedTo = Math.max(0, Math.min(adjustedTo, newBlocks.length))
-            
+
             newBlocks.splice(adjustedTo, 0, moved)
-            
+
             this.updateStateFromBlocks(newBlocks)
-            
+
             // Update move buttons in iframe after move completes
             setTimeout(() => {
                 this.sendMessageToIframe({ type: 'updateMoveButtons' })
@@ -307,7 +297,7 @@ export default function masonComponent({
                     })
                 }
             }
-            
+
             // Update the state with new blocks array
             this.state = plainBlocks
             // Use the statePath from the component
@@ -362,7 +352,7 @@ export default function masonComponent({
                             }
                         }
                     }
-                    
+
                     // Try immediately, then with delays
                     setTimeout(restore, 0)
                     setTimeout(restore, 50)
@@ -376,10 +366,10 @@ export default function masonComponent({
         updatePreview() {
             // Save scroll position before updating
             this.saveScrollPosition()
-            
+
             // Update iframe using form submission (more reliable than srcdoc)
             const blocks = this.getBlocksFromState()
-            
+
             // Ensure blocks are plain objects (not Proxy) before stringifying
             let plainBlocks = blocks
             try {
@@ -388,7 +378,7 @@ export default function masonComponent({
                 // If JSON conversion fails, use blocks as-is (shouldn't happen after getBlocksFromState)
                 plainBlocks = blocks
             }
-            
+
             // Create a form that will submit to the iframe
             const form = document.createElement('form')
             form.method = 'POST'
@@ -429,7 +419,7 @@ export default function masonComponent({
             // Append form to body, submit, then remove
             document.body.appendChild(form)
             form.submit()
-            
+
             // Remove form after a short delay
             setTimeout(() => {
                 if (form.parentNode) {

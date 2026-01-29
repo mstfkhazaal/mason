@@ -25,17 +25,7 @@ abstract class Brick
         return null;
     }
 
-    public static function toHtml(array $config, array $data): ?string
-    {
-        return null;
-    }
-
-    public static function getPreviewLabel(array $config): string
-    {
-        return static::getLabel();
-    }
-
-    public static function toPreviewHtml(array $config): ?string
+    public static function toHtml(array $config, ?array $data = null): ?string
     {
         return null;
     }

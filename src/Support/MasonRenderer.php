@@ -88,7 +88,7 @@ class MasonRenderer implements Htmlable
     public function toText(): string
     {
         $html = $this->toUnsafeHtml();
-        
+
         // Strip HTML tags and decode entities
         return strip_tags($html);
     }
@@ -99,6 +99,20 @@ class MasonRenderer implements Htmlable
     public function toArray(): array
     {
         return $this->getBlocks();
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     */
+    public function getBrickHtml(string $id, array $config): ?string
+    {
+        foreach ($this->getBricks() as $brick) {
+            if (is_string($brick) && ($brick::getId() === $id)) {
+                return $brick::toHtml($config, data: []);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -117,26 +131,12 @@ class MasonRenderer implements Htmlable
         // Try to decode JSON if it's a string
         if (is_string($this->content)) {
             $decoded = json_decode($this->content, true);
-            
+
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                 return $decoded;
             }
         }
 
         return [];
-    }
-
-    /**
-     * @param  array<string, mixed>  $config
-     */
-    public function getBrickHtml(string $id, array $config): ?string
-    {
-        foreach ($this->getBricks() as $brick) {
-            if (is_string($brick) && ($brick::getId() === $id)) {
-                return $brick::toHtml($config, data: []);
-            }
-        }
-
-        return null;
     }
 }

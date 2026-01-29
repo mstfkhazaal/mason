@@ -24,19 +24,7 @@ class {{ class_name }} extends Brick
         return parent::getLabel();
     }
 
-    public static function getPreviewLabel(array $config): string
-    {
-        return static::getLabel();
-    }
-
-    public static function toPreviewHtml(array $config): ?string
-    {
-        return view('{{ preview_path }}', [
-           'config' => $config,
-       ]);
-    }
-
-    public static function toHtml(array $config, array $data): ?string
+    public static function toHtml(array $config, ?array $data = null): ?string
     {
         return view('{{ html_path }}', [
             'config' => $config,

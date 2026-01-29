@@ -77,8 +77,17 @@ body {
     min-height: 2rem;
     border: 2px dashed transparent;
     transition: border-color 0.2s;
+    margin-top: -1rem;
+    margin-bottom: -1rem;
+    z-index: 10;
+    position: relative;
 }
 .mason-drop-zone.active {
     border-color: var(--mason-border-color, #0ea5e9);
     background: var(--mason-drop-zone-background, rgba(14, 165, 233, 0.1));
+
+    &:first-of-type {
+        margin-top: 0;
+        margin-bottom: -2rem;
+    }
 }

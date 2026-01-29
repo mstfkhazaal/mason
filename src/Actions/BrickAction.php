@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Awcodes\Mason\Actions;
 
 use Awcodes\Mason\Mason;
-use Awcodes\Mason\Support\BlockCommand;
+use Awcodes\Mason\Support\BrickCommand;
 use Filament\Actions\Action;
 use Filament\Support\Enums\Width;
 
@@ -53,8 +53,8 @@ class BrickAction
                     'attrs' => [
                         'config' => $data,
                         'id' => $arguments['id'],
-                        'label' => $brick::getPreviewLabel($data),
-                        'preview' => base64_encode($brick::toPreviewHtml($data)),
+                        'label' => $brick::getLabel(),
+                        'preview' => base64_encode($brick::toHtml($data)),
                     ],
                 ];
 
@@ -69,7 +69,7 @@ class BrickAction
                 if (filled($arguments['dragPosition'] ?? null)) {
                     $position = (int) $arguments['dragPosition'];
                     $component->executeCommands([
-                        BlockCommand::insertBlock($brickContent, $position),
+                        BrickCommand::insertBrick($brickContent, $position),
                     ]);
 
                     return;
@@ -79,7 +79,7 @@ class BrickAction
                 if ($mode === 'edit' && isset($arguments['blockIndex'])) {
                     $index = (int) $arguments['blockIndex'];
                     $component->executeCommands([
-                        BlockCommand::updateBlock($index, $brickContent),
+                        BrickCommand::updateBrick($index, $brickContent),
                     ]);
 
                     return;
@@ -88,7 +88,7 @@ class BrickAction
                 // Insert at the end (default for insert mode)
                 $position = count($state);
                 $component->executeCommands([
-                    BlockCommand::insertBlock($brickContent, $position),
+                    BrickCommand::insertBrick($brickContent, $position),
                 ]);
             });
     }
