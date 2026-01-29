@@ -1,10 +1,9 @@
 <x-dynamic-component :component="$getEntryWrapperView()" :entry="$entry">
     <div
         {{
-            \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())
-                ->class([
-                    'mason-entry',
-                ])
+            \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class([
+                'mason-entry',
+            ])
         }}
     >
         <div class="mason">

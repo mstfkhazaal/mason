@@ -6,7 +6,7 @@
             @apply flex max-h-[40rem] min-h-[20rem];
 
             .mason-editor-wrapper {
-                @apply flex-1 relative;
+                @apply relative flex-1;
 
                 .mason-iframe {
                     @apply min-h-full w-full border-0;
@@ -15,11 +15,11 @@
             }
 
             .mason-sidebar {
-                @apply hidden shrink-0 divide-y divide-gray-950/10 max-w-[12rem] md:flex flex-col h-full border-s border-gray-950/10 bg-gray-50 dark:border-white/5 dark:bg-gray-950/20 dark:divide-white/5;
+                @apply hidden h-full max-w-[12rem] shrink-0 flex-col divide-y divide-gray-950/10 border-s border-gray-950/10 bg-gray-50 md:flex dark:divide-white/5 dark:border-white/5 dark:bg-gray-950/20;
 
                 .mason-controls,
                 .mason-actions-bricks {
-                    @apply p-2 gap-2;
+                    @apply gap-2 p-2;
                 }
 
                 .mason-controls {
@@ -35,21 +35,21 @@
                 }
 
                 .mason-actions {
-                    @apply overflow-hidden flex-1 flex flex-col divide-y divide-gray-950/10 dark:divide-white/5;
+                    @apply flex flex-1 flex-col divide-y divide-gray-950/10 overflow-hidden dark:divide-white/5;
 
                     .mason-actions-search {
                         @apply p-0;
 
                         .fi-input-wrp {
-                            @apply ring-0 rounded-none bg-transparent;
+                            @apply rounded-none bg-transparent ring-0;
                         }
                     }
 
                     .mason-actions-bricks {
-                        @apply flex-1 overflow-y-auto flex flex-col gap-2;
+                        @apply flex flex-1 flex-col gap-2 overflow-y-auto;
 
                         .mason-actions-brick {
-                            @apply cursor-move flex items-center gap-2 rounded border text-xs ps-3 pe-4 py-2 bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-700;
+                            @apply flex cursor-move items-center gap-2 rounded border border-gray-300 bg-white py-2 pe-4 ps-3 text-xs dark:border-gray-700 dark:bg-gray-800;
 
                             &.filtered {
                                 display: none !important;
@@ -66,7 +66,7 @@
     }
 
     &.fullscreen {
-        @apply fixed inset-0 bg-white dark:bg-gray-900 z-30;
+        @apply fixed inset-0 z-30 bg-white dark:bg-gray-900;
 
         .mason-input-wrapper {
             @apply h-full rounded-none;
@@ -107,5 +107,3 @@
         }
     }
 }
-
-

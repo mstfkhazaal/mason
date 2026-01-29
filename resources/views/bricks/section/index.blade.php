@@ -22,10 +22,10 @@
         },
     ])
 >
-    <div class="mx-auto w-full max-w-5xl px-6 py-8 @3xl:py-12">
+    <div class="@3xl:py-12 mx-auto w-full max-w-5xl px-6 py-8">
         <div
             @class([
-                'grid gap-6 @3xl:grid-cols-3',
+                '@3xl:grid-cols-3 grid gap-6',
                 'items-center' => $image_alignment === 'middle',
                 'items-end' => $image_alignment === 'bottom',
                 'items-start' => $image_alignment === 'top',
@@ -59,7 +59,7 @@
                 ])
             >
                 @if ($text)
-                    <div class="prose max-w-none prose-headings:font-display">
+                    <div class="prose prose-headings:font-display max-w-none">
                         {!! $text !!}
                     </div>
                 @endif

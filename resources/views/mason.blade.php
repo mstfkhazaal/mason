@@ -17,26 +17,26 @@
         @else
             x-load
         @endif
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('mason', 'awcodes/mason') }}"
+        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc("mason", "awcodes/mason") }}"
         x-data="masonComponent({
-            key: @js($key),
-            livewireId: @js($this->getId()),
-            state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
-            statePath: @js($statePath),
-            placeholder: @js($getPlaceholder()),
-            disabled: @js($isDisabled),
-            dblClickToEdit: @js($shouldDblClickToEdit()),
-            bricks: @js(array_map(fn($brick) => is_string($brick) ? $brick : get_class($brick), $bricks)),
-            previewLayout: @js($getPreviewLayout()),
-        })"
-        id="{{ 'mason-wrapper-' . $statePath }}"
+                    key: @js($key),
+                    livewireId: @js($this->getId()),
+                    state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
+                    statePath: @js($statePath),
+                    placeholder: @js($getPlaceholder()),
+                    disabled: @js($isDisabled),
+                    dblClickToEdit: @js($shouldDblClickToEdit()),
+                    bricks: @js(array_map(fn ($brick) => is_string($brick) ? $brick : get_class($brick), $bricks)),
+                    previewLayout: @js($getPreviewLayout()),
+                })"
+        id="{{ "mason-wrapper-" . $statePath }}"
         class="mason-wrapper"
         tabindex="-1"
         x-bind:class="{
             'fullscreen': fullscreen,
             'display-mobile': viewport === 'mobile',
             'display-tablet': viewport === 'tablet',
-            'display-desktop': viewport === 'desktop'
+            'display-desktop': viewport === 'desktop',
         }"
         x-on:keydown.escape.window="fullscreen = false"
         x-on:click.away="deselectAllBlocks()"
@@ -52,16 +52,17 @@
         >
             <div
                 @class([
-                    'flex flex-1',
-                    'flex-row-reverse' => $getSidebarPosition() === \Awcodes\Mason\Enums\SidebarPosition::Start,
+                    "flex flex-1",
+                    "flex-row-reverse" =>
+                        $getSidebarPosition() === \Awcodes\Mason\Enums\SidebarPosition::Start,
                 ])
             >
-                <div class="mason-editor-wrapper"
+                <div
+                    class="mason-editor-wrapper"
                     {{
-                        \Filament\Support\prepare_inherited_attributes($getExtraInputAttributeBag())
-                            ->class([
-                                'mason-input-wrapper',
-                            ])
+                        \Filament\Support\prepare_inherited_attributes($getExtraInputAttributeBag())->class([
+                            "mason-input-wrapper",
+                        ])
                     }}
                 >
                     <iframe
@@ -73,7 +74,10 @@
                 </div>
 
                 @if (! $isDisabled && filled($bricks))
-                    <x-mason::sidebar :bricks="$bricks" wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}" />
+                    <x-mason::sidebar
+                        :bricks="$bricks"
+                        wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}"
+                    />
                 @endif
             </div>
         </x-filament::input.wrapper>

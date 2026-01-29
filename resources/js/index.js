@@ -46,7 +46,9 @@ export default function masonComponent({
 
                         // Update move buttons after iframe loads
                         setTimeout(() => {
-                            this.sendMessageToIframe({ type: 'updateMoveButtons' })
+                            this.sendMessageToIframe({
+                                type: 'updateMoveButtons',
+                            })
                         }, 100)
                     })
                 }
@@ -61,7 +63,10 @@ export default function masonComponent({
 
                 switch (type) {
                     case 'ready':
-                        this.sendMessageToIframe({ type: 'setContent', blocks: this.getBlocksFromState() })
+                        this.sendMessageToIframe({
+                            type: 'setContent',
+                            blocks: this.getBlocksFromState(),
+                        })
                         break
                     case 'editBlock':
                         this.handleEditBlock(data)
@@ -92,7 +97,10 @@ export default function masonComponent({
                 setTimeout(() => {
                     if (iframe && iframe.contentWindow) {
                         try {
-                            iframe.contentWindow.postMessage({ type: 'updateMoveButtons' }, '*')
+                            iframe.contentWindow.postMessage(
+                                { type: 'updateMoveButtons' },
+                                '*',
+                            )
                         } catch (e) {
                             // Ignore cross-origin errors
                         }
@@ -125,7 +133,9 @@ export default function masonComponent({
                 return []
             }
 
-            return stateArray.filter(block => block && block.type === 'masonBrick')
+            return stateArray.filter(
+                (block) => block && block.type === 'masonBrick',
+            )
         },
 
         sendMessageToIframe(message) {
@@ -140,14 +150,16 @@ export default function masonComponent({
             this.sendMessageToIframe({
                 type: 'setConfig',
                 dblClickToEdit: dblClickToEdit,
-                disabled: disabled
+                disabled: disabled,
             })
         },
 
         setupDragAndDrop() {
             // The sidebar already has draggable="true" and dragstart handler
             // We just need to handle the drop on the iframe
-            const iframeContainer = this.$el.querySelector('.mason-editor-wrapper')
+            const iframeContainer = this.$el.querySelector(
+                '.mason-editor-wrapper',
+            )
 
             if (iframeContainer) {
                 iframeContainer.addEventListener('dragover', (e) => {
@@ -218,7 +230,9 @@ export default function masonComponent({
 
             if (index >= 0 && index < blocks.length) {
                 // Create a new array with the updated block
-                const newBlocks = blocks.map((block, i) => i === index ? brick : block)
+                const newBlocks = blocks.map((block, i) =>
+                    i === index ? brick : block,
+                )
 
                 this.updateStateFromBlocks(newBlocks)
             }
@@ -288,7 +302,7 @@ export default function masonComponent({
             } catch (e) {
                 // If conversion fails, try to create a new array manually
                 if (Array.isArray(blocks)) {
-                    plainBlocks = blocks.map(block => {
+                    plainBlocks = blocks.map((block) => {
                         try {
                             return JSON.parse(JSON.stringify(block))
                         } catch {
@@ -326,8 +340,14 @@ export default function masonComponent({
             if (iframe && iframe.contentWindow) {
                 try {
                     savedScrollPosition = {
-                        x: iframe.contentWindow.scrollX || iframe.contentWindow.pageXOffset || 0,
-                        y: iframe.contentWindow.scrollY || iframe.contentWindow.pageYOffset || 0,
+                        x:
+                            iframe.contentWindow.scrollX ||
+                            iframe.contentWindow.pageXOffset ||
+                            0,
+                        y:
+                            iframe.contentWindow.scrollY ||
+                            iframe.contentWindow.pageYOffset ||
+                            0,
                     }
                 } catch (e) {
                     // Cross-origin or other error, reset to 0
@@ -338,14 +358,23 @@ export default function masonComponent({
 
         restoreScrollPosition() {
             // Restore scroll position in iframe's content window
-            if (iframe && iframe.contentWindow && (savedScrollPosition.x > 0 || savedScrollPosition.y > 0)) {
+            if (
+                iframe &&
+                iframe.contentWindow &&
+                (savedScrollPosition.x > 0 || savedScrollPosition.y > 0)
+            ) {
                 try {
                     // Use multiple timeouts to ensure content is fully loaded and rendered
                     const restore = () => {
                         if (iframe && iframe.contentWindow) {
-                            const doc = iframe.contentDocument || iframe.contentWindow.document
+                            const doc =
+                                iframe.contentDocument ||
+                                iframe.contentWindow.document
                             if (doc && doc.readyState === 'complete') {
-                                iframe.contentWindow.scrollTo(savedScrollPosition.x, savedScrollPosition.y)
+                                iframe.contentWindow.scrollTo(
+                                    savedScrollPosition.x,
+                                    savedScrollPosition.y,
+                                )
                             } else {
                                 // If not ready, try again
                                 setTimeout(restore, 50)
@@ -413,7 +442,8 @@ export default function masonComponent({
             const csrfInput = document.createElement('input')
             csrfInput.type = 'hidden'
             csrfInput.name = '_token'
-            csrfInput.value = document.querySelector('meta[name="csrf-token"]')?.content || ''
+            csrfInput.value =
+                document.querySelector('meta[name="csrf-token"]')?.content || ''
             form.appendChild(csrfInput)
 
             // Append form to body, submit, then remove

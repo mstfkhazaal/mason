@@ -26,7 +26,7 @@ class MasonRenderer implements Htmlable
      */
     public function __construct(string | array | null $content = null)
     {
-        if (array_key_exists('content', $content)) {
+        if (is_array($content) && array_key_exists('content', $content)) {
             $content = $content['content'];
         }
 

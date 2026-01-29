@@ -3,17 +3,23 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Exception\Configuration\InvalidConfigurationException;
 
-return RectorConfig::configure()
-    ->withPaths([
-        __DIR__ . '/src',
-        __DIR__ . '/config',
-    ])
-    ->withPreparedSets(
-        deadCode: true,
-        codeQuality: true,
-        typeDeclarations: true,
-        privatization: true,
-        earlyReturn: true,
-    )
-    ->withPhpSets();
+try {
+    return RectorConfig::configure()
+        ->withPaths([
+            __DIR__ . '/src',
+            __DIR__ . '/config',
+        ])
+        ->withPreparedSets(
+            deadCode: true,
+            codeQuality: true,
+            typeDeclarations: true,
+            privatization: true,
+            earlyReturn: true,
+        )
+        ->withPhpSets();
+} catch (InvalidConfigurationException $e) {
+    echo 'Rector configuration error: ' . $e->getMessage();
+    exit(1);
+}

@@ -1,0 +1,75 @@
+<?php
+
+declare(strict_types=1);
+
+use Awcodes\Mason\Actions\BrickAction;
+use Awcodes\Mason\Mason;
+use Filament\Actions\Action;
+
+describe('Mason field configuration', function () {
+    describe('doubleClickToEdit()', function () {
+        it('enables double click to edit', function () {
+            $field = Mason::make('content')
+                ->doubleClickToEdit();
+
+            expect($field->shouldDblClickToEdit())->toBeTrue();
+        });
+
+        it('disables double click to edit', function () {
+            $field = Mason::make('content')
+                ->doubleClickToEdit(false);
+
+            expect($field->shouldDblClickToEdit())->toBeFalse();
+        });
+
+        it('accepts closure', function () {
+            $field = Mason::make('content')
+                ->doubleClickToEdit(fn () => true);
+
+            expect($field->shouldDblClickToEdit())->toBeTrue();
+        });
+
+        it('defaults to false', function () {
+            $field = Mason::make('content');
+
+            expect($field->shouldDblClickToEdit())->toBeFalse();
+        });
+    });
+
+    describe('previewLayout()', function () {
+        it('sets preview layout', function () {
+            $field = Mason::make('content')
+                ->previewLayout('custom.layout');
+
+            expect($field->getPreviewLayout())->toBe('custom.layout');
+        });
+
+        it('accepts closure', function () {
+            $field = Mason::make('content')
+                ->previewLayout(fn () => 'dynamic.layout');
+
+            expect($field->getPreviewLayout())->toBe('dynamic.layout');
+        });
+
+        it('falls back to config value when set to null', function () {
+            $field = Mason::make('content')
+                ->previewLayout(null);
+
+            // Will fall back to config('mason.preview.layout') which has a default
+            $layout = $field->getPreviewLayout();
+
+            expect($layout)->toBeString();
+        });
+    });
+
+    describe('getDefaultActions()', function () {
+        it('returns action with BrickAction name', function () {
+            $field = Mason::make('content');
+            $actions = $field->getDefaultActions();
+
+            expect($actions)->toHaveCount(1)
+                ->and($actions[0])->toBeInstanceOf(Action::class)
+                ->and($actions[0]->getName())->toBe(BrickAction::NAME);
+        });
+    });
+});

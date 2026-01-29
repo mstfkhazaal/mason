@@ -1,11 +1,25 @@
 <div id="mason-preview-container">
-    @if(empty($blocks))
-        <div class="mason-drop-zone" data-drop-index="0" style="min-height: 4rem; display: flex; align-items: center; justify-content: center; color: #9ca3af;">
+    @if (empty($blocks))
+        <div
+            class="mason-drop-zone"
+            data-drop-index="0"
+            style="
+                min-height: 4rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #9ca3af;
+            "
+        >
             {{ __('mason::mason.preview.placeholder') }}
         </div>
     @else
-        <div class="mason-drop-zone" data-drop-index="0" style="min-height: 2rem;"></div>
-        @foreach($blocks as $block)
+        <div
+            class="mason-drop-zone"
+            data-drop-index="0"
+            style="min-height: 2rem"
+        ></div>
+        @foreach ($blocks as $block)
             <div
                 class="mason-block"
                 draggable="true"
@@ -22,8 +36,16 @@
                         data-block-index="{{ $block['index'] }}"
                         data-total-blocks="{{ count($blocks) }}"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <title>{{ __('mason::mason.preview.move_up') }}</title>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <title>
+                                {{ __('mason::mason.preview.move_up') }}
+                            </title>
                             <polyline points="18 15 12 9 6 15"></polyline>
                         </svg>
                     </button>
@@ -34,8 +56,16 @@
                         data-block-index="{{ $block['index'] }}"
                         data-total-blocks="{{ count($blocks) }}"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <title>{{ __('mason::mason.preview.move_down') }}</title>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <title>
+                                {{ __('mason::mason.preview.move_down') }}
+                            </title>
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </button>
@@ -44,10 +74,21 @@
                         title="Edit"
                         data-action="edit"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-                            <title>{{ __('mason::mason.preview.edit') }}</title>
-                            <path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
-                            <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" />
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            class="size-5"
+                        >
+                            <title>
+                                {{ __('mason::mason.preview.edit') }}
+                            </title>
+                            <path
+                                d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"
+                            />
+                            <path
+                                d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"
+                            />
                         </svg>
                     </button>
                     <button
@@ -55,9 +96,20 @@
                         title="Delete"
                         data-action="delete"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-                            <title>{{ __('mason::mason.preview.delete') }}</title>
-                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            class="size-5"
+                        >
+                            <title>
+                                {{ __('mason::mason.preview.delete') }}
+                            </title>
+                            <path
+                                fill-rule="evenodd"
+                                d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z"
+                                clip-rule="evenodd"
+                            />
                         </svg>
                     </button>
                 </div>
@@ -65,7 +117,10 @@
                     {!! $block['html'] ?? '' !!}
                 </div>
             </div>
-            <div class="mason-drop-zone" data-drop-index="{{ $block['index'] + 1 }}"></div>
+            <div
+                class="mason-drop-zone"
+                data-drop-index="{{ $block['index'] + 1 }}"
+            ></div>
         @endforeach
     @endif
 </div>
@@ -73,460 +128,531 @@
 <script>
     // This will be replaced by the actual iframe-handler.js content
     // For now, include basic postMessage handling
-    (function() {
-        const container = document.getElementById('mason-preview-container');
-        let selectedBlock = null;
-        let dblClickToEdit = false;
-        let isDisabled = false;
+    ;(function () {
+        const container = document.getElementById('mason-preview-container')
+        let selectedBlock = null
+        let dblClickToEdit = false
+        let isDisabled = false
 
         // Listen for messages from parent
-        window.addEventListener('message', function(event) {
+        window.addEventListener('message', function (event) {
             // Security: verify origin if needed
             // if (event.origin !== window.location.origin) return;
 
-            const { type, ...data } = event.data;
+            const { type, ...data } = event.data
 
             switch (type) {
                 case 'setContent':
                     if (data.dblClickToEdit !== undefined) {
-                        dblClickToEdit = data.dblClickToEdit;
+                        dblClickToEdit = data.dblClickToEdit
                     }
 
                     shouldBeDisabled(data)
 
-                    updateContent(data.blocks);
-                    break;
+                    updateContent(data.blocks)
+                    break
                 case 'setConfig':
                     if (data.dblClickToEdit !== undefined) {
-                        dblClickToEdit = data.dblClickToEdit;
+                        dblClickToEdit = data.dblClickToEdit
                     }
 
                     shouldBeDisabled(data)
-                    break;
+                    break
                 case 'insertBlock':
-                    insertBlock(data.brick, data.position);
-                    break;
+                    insertBlock(data.brick, data.position)
+                    break
                 case 'updateBlock':
-                    updateBlock(data.index, data.brick);
-                    break;
+                    updateBlock(data.index, data.brick)
+                    break
                 case 'deleteBlock':
-                    deleteBlock(data.index);
-                    break;
+                    deleteBlock(data.index)
+                    break
                 case 'moveBlock':
-                    moveBlock(data.from, data.to);
-                    break;
+                    moveBlock(data.from, data.to)
+                    break
                 case 'selectBlock':
-                    selectBlock(data.index);
-                    break;
+                    selectBlock(data.index)
+                    break
                 case 'updateMoveButtons':
-                    updateAllMoveButtons();
-                    break;
+                    updateAllMoveButtons()
+                    break
                 case 'deselectAllBlocks':
-                    deselectAllBlocks();
-                    break;
+                    deselectAllBlocks()
+                    break
             }
-        });
+        })
 
         // Send ready message when loaded
-        window.addEventListener('load', function() {
-            updateAllMoveButtons();
-            window.parent.postMessage({ type: 'ready' }, '*');
-        });
+        window.addEventListener('load', function () {
+            updateAllMoveButtons()
+            window.parent.postMessage({ type: 'ready' }, '*')
+        })
 
         function updateContent(blocks) {
             // This will be handled by reloading the iframe with new content
             // For now, we'll just notify parent that we need a reload
-            window.parent.postMessage({ type: 'contentUpdated' }, '*');
+            window.parent.postMessage({ type: 'contentUpdated' }, '*')
             // Update buttons after a short delay to ensure DOM is updated
-            setTimeout(updateAllMoveButtons, 100);
+            setTimeout(updateAllMoveButtons, 100)
         }
 
         function shouldBeDisabled(data) {
             if (data.disabled !== undefined) {
-                isDisabled = data.disabled;
+                isDisabled = data.disabled
             }
 
             if (isDisabled) {
-                container.style.pointerEvents = 'none';
+                container.style.pointerEvents = 'none'
             } else {
-                container.style.pointerEvents = '';
+                container.style.pointerEvents = ''
             }
         }
 
         function insertBlock(brick, position) {
-            window.parent.postMessage({
-                type: 'insertBlockRequest',
-                brick,
-                position
-            }, '*');
+            window.parent.postMessage(
+                {
+                    type: 'insertBlockRequest',
+                    brick,
+                    position,
+                },
+                '*',
+            )
         }
 
         function updateBlock(index, brick) {
-            window.parent.postMessage({
-                type: 'updateBlockRequest',
-                index,
-                brick
-            }, '*');
+            window.parent.postMessage(
+                {
+                    type: 'updateBlockRequest',
+                    index,
+                    brick,
+                },
+                '*',
+            )
         }
 
         function deleteBlock(index) {
-            window.parent.postMessage({
-                type: 'deleteBlockRequest',
-                index
-            }, '*');
+            window.parent.postMessage(
+                {
+                    type: 'deleteBlockRequest',
+                    index,
+                },
+                '*',
+            )
         }
 
         function moveBlock(from, to) {
-            window.parent.postMessage({
-                type: 'moveBlockRequest',
-                from,
-                to
-            }, '*');
+            window.parent.postMessage(
+                {
+                    type: 'moveBlockRequest',
+                    from,
+                    to,
+                },
+                '*',
+            )
         }
 
         function selectBlock(index) {
             // Remove previous selection
             if (selectedBlock) {
-                selectedBlock.classList.remove('selected');
+                selectedBlock.classList.remove('selected')
             }
 
-            const block = container.querySelector(`[data-block-index="${index}"]`);
+            const block = container.querySelector(
+                `[data-block-index="${index}"]`,
+            )
             if (block) {
-                block.classList.add('selected');
-                selectedBlock = block;
-                updateMoveButtons(block);
+                block.classList.add('selected')
+                selectedBlock = block
+                updateMoveButtons(block)
             }
         }
 
         function updateMoveButtons(block) {
-            if (!block) return;
+            if (!block) return
 
-            const index = parseInt(block.getAttribute('data-block-index'));
-            const allBlocks = container.querySelectorAll('.mason-block');
-            const totalBlocks = allBlocks.length;
+            const index = parseInt(block.getAttribute('data-block-index'))
+            const allBlocks = container.querySelectorAll('.mason-block')
+            const totalBlocks = allBlocks.length
 
-            const moveUpBtn = block.querySelector('[data-action="move-up"]');
-            const moveDownBtn = block.querySelector('[data-action="move-down"]');
+            const moveUpBtn = block.querySelector('[data-action="move-up"]')
+            const moveDownBtn = block.querySelector('[data-action="move-down"]')
 
             if (moveUpBtn) {
-                moveUpBtn.disabled = index === 0;
+                moveUpBtn.disabled = index === 0
             }
 
             if (moveDownBtn) {
-                moveDownBtn.disabled = index === totalBlocks - 1;
+                moveDownBtn.disabled = index === totalBlocks - 1
             }
         }
 
         function deselectAllBlocks() {
-            container.querySelectorAll('.mason-block').forEach(block => {
-                block.classList.remove('selected');
-            });
-            selectedBlock = null;
+            container.querySelectorAll('.mason-block').forEach((block) => {
+                block.classList.remove('selected')
+            })
+            selectedBlock = null
         }
 
         // Update move buttons for all blocks on load
         function updateAllMoveButtons() {
-            const blocks = container.querySelectorAll('.mason-block');
+            const blocks = container.querySelectorAll('.mason-block')
             blocks.forEach((block, idx) => {
                 // Update the data-block-index to match current position
-                block.setAttribute('data-block-index', idx.toString());
-                updateMoveButtons(block);
-            });
+                block.setAttribute('data-block-index', idx.toString())
+                updateMoveButtons(block)
+            })
         }
 
         // Handle block clicks for editing
-        container.addEventListener('click', function(e) {
-            const block = e.target.closest('.mason-block');
-            if (!block) return;
+        container.addEventListener('click', function (e) {
+            const block = e.target.closest('.mason-block')
+            if (!block) return
 
-            const action = e.target.closest('[data-action]');
+            const action = e.target.closest('[data-action]')
             if (action) {
-                const actionType = action.getAttribute('data-action');
-                const index = parseInt(block.getAttribute('data-block-index'));
-                const brickId = block.getAttribute('data-brick-id');
-                const config = JSON.parse(block.getAttribute('data-config') || '{}');
+                const actionType = action.getAttribute('data-action')
+                const index = parseInt(block.getAttribute('data-block-index'))
+                const brickId = block.getAttribute('data-brick-id')
+                const config = JSON.parse(
+                    block.getAttribute('data-config') || '{}',
+                )
 
                 if (actionType === 'edit') {
-                    window.parent.postMessage({
-                        type: 'editBlock',
-                        index,
-                        brickId,
-                        config
-                    }, '*');
+                    window.parent.postMessage(
+                        {
+                            type: 'editBlock',
+                            index,
+                            brickId,
+                            config,
+                        },
+                        '*',
+                    )
                 } else if (actionType === 'delete') {
-                    window.parent.postMessage({
-                        type: 'deleteBlockRequest',
-                        index
-                    }, '*');
+                    window.parent.postMessage(
+                        {
+                            type: 'deleteBlockRequest',
+                            index,
+                        },
+                        '*',
+                    )
                 } else if (actionType === 'move-up') {
                     if (!action.disabled) {
-                        window.parent.postMessage({
-                            type: 'moveBlockRequest',
-                            from: index,
-                            to: index - 1
-                        }, '*');
+                        window.parent.postMessage(
+                            {
+                                type: 'moveBlockRequest',
+                                from: index,
+                                to: index - 1,
+                            },
+                            '*',
+                        )
                     }
                 } else if (actionType === 'move-down') {
                     if (!action.disabled) {
-                        window.parent.postMessage({
-                            type: 'moveBlockRequest',
-                            from: index,
-                            to: index + 1
-                        }, '*');
+                        window.parent.postMessage(
+                            {
+                                type: 'moveBlockRequest',
+                                from: index,
+                                to: index + 1,
+                            },
+                            '*',
+                        )
                     }
                 }
             } else {
                 // Click on block content - select it
-                const index = parseInt(block.getAttribute('data-block-index'));
-                selectBlock(index);
+                const index = parseInt(block.getAttribute('data-block-index'))
+                selectBlock(index)
             }
-        });
+        })
 
         // Handle double-click to edit
-        container.addEventListener('dblclick', function(e) {
-            if (!dblClickToEdit) return;
+        container.addEventListener('dblclick', function (e) {
+            if (!dblClickToEdit) return
 
-            const block = e.target.closest('.mason-block');
-            if (!block) return;
+            const block = e.target.closest('.mason-block')
+            if (!block) return
 
             // Ignore double-clicks on controls
             if (e.target.closest('.mason-block-controls')) {
-                return;
+                return
             }
 
             // Only trigger on block content, not on buttons
             if (e.target.closest('[data-action]')) {
-                return;
+                return
             }
 
-            const index = parseInt(block.getAttribute('data-block-index'));
-            const brickId = block.getAttribute('data-brick-id');
-            const config = JSON.parse(block.getAttribute('data-config') || '{}');
+            const index = parseInt(block.getAttribute('data-block-index'))
+            const brickId = block.getAttribute('data-brick-id')
+            const config = JSON.parse(block.getAttribute('data-config') || '{}')
 
             // Trigger edit action
-            window.parent.postMessage({
-                type: 'editBlock',
-                index,
-                brickId,
-                config
-            }, '*');
-        });
+            window.parent.postMessage(
+                {
+                    type: 'editBlock',
+                    index,
+                    brickId,
+                    config,
+                },
+                '*',
+            )
+        })
 
         // Handle drag and drop for repositioning blocks
-        let draggedBlockIndex = null;
-        let draggedBlock = null;
-        let dragOverIndex = null;
+        let draggedBlockIndex = null
+        let draggedBlock = null
+        let dragOverIndex = null
 
         // Make blocks draggable for repositioning
-        container.addEventListener('dragstart', function(e) {
-            const block = e.target.closest('.mason-block');
-            if (!block) return;
+        container.addEventListener('dragstart', function (e) {
+            const block = e.target.closest('.mason-block')
+            if (!block) return
 
             // Prevent dragging if clicking on controls (but allow drag handle)
             if (e.target.closest('.mason-block-controls')) {
-                e.preventDefault();
-                return;
+                e.preventDefault()
+                return
             }
 
             // Ensure we're dragging the block
-            if (!block.hasAttribute('draggable') || block.getAttribute('draggable') !== 'true') {
-                return;
+            if (
+                !block.hasAttribute('draggable') ||
+                block.getAttribute('draggable') !== 'true'
+            ) {
+                return
             }
 
-            draggedBlock = block;
-            draggedBlockIndex = parseInt(block.getAttribute('data-block-index'));
+            draggedBlock = block
+            draggedBlockIndex = parseInt(block.getAttribute('data-block-index'))
 
             if (isNaN(draggedBlockIndex)) {
-                return;
+                return
             }
 
-            block.classList.add('dragging');
+            block.classList.add('dragging')
 
             // Disable all interactions during drag
-            document.body.style.userSelect = 'none';
-            document.body.style.webkitUserSelect = 'none';
-            document.body.style.mozUserSelect = 'none';
-            document.body.style.msUserSelect = 'none';
+            document.body.style.userSelect = 'none'
+            document.body.style.webkitUserSelect = 'none'
+            document.body.style.mozUserSelect = 'none'
+            document.body.style.msUserSelect = 'none'
 
             // Disable pointer events on all content inside the block
-            const blockContent = block.querySelector('.mason-block-content');
+            const blockContent = block.querySelector('.mason-block-content')
             if (blockContent) {
-                blockContent.style.pointerEvents = 'none';
-                blockContent.style.userSelect = 'none';
-                blockContent.style.webkitUserSelect = 'none';
-                blockContent.style.mozUserSelect = 'none';
-                blockContent.style.msUserSelect = 'none';
+                blockContent.style.pointerEvents = 'none'
+                blockContent.style.userSelect = 'none'
+                blockContent.style.webkitUserSelect = 'none'
+                blockContent.style.mozUserSelect = 'none'
+                blockContent.style.msUserSelect = 'none'
             }
 
             // Set drag data
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', draggedBlockIndex.toString());
-        });
+            e.dataTransfer.effectAllowed = 'move'
+            e.dataTransfer.setData('text/plain', draggedBlockIndex.toString())
+        })
 
-        container.addEventListener('dragend', function(e) {
+        container.addEventListener('dragend', function (e) {
             // Re-enable interactions
-            document.body.style.userSelect = '';
-            document.body.style.webkitUserSelect = '';
-            document.body.style.mozUserSelect = '';
-            document.body.style.msUserSelect = '';
+            document.body.style.userSelect = ''
+            document.body.style.webkitUserSelect = ''
+            document.body.style.mozUserSelect = ''
+            document.body.style.msUserSelect = ''
 
             if (draggedBlock) {
-                draggedBlock.classList.remove('dragging');
-                const blockContent = draggedBlock.querySelector('.mason-block-content');
+                draggedBlock.classList.remove('dragging')
+                const blockContent = draggedBlock.querySelector(
+                    '.mason-block-content',
+                )
                 if (blockContent) {
-                    blockContent.style.pointerEvents = '';
-                    blockContent.style.userSelect = '';
-                    blockContent.style.webkitUserSelect = '';
-                    blockContent.style.mozUserSelect = '';
-                    blockContent.style.msUserSelect = '';
+                    blockContent.style.pointerEvents = ''
+                    blockContent.style.userSelect = ''
+                    blockContent.style.webkitUserSelect = ''
+                    blockContent.style.mozUserSelect = ''
+                    blockContent.style.msUserSelect = ''
                 }
             }
 
             // Clear all active drop zones and outlines
-            container.querySelectorAll('.mason-drop-zone.active').forEach(zone => {
-                zone.classList.remove('active');
-            });
-            container.querySelectorAll('.mason-block').forEach(block => {
-                block.style.outline = '';
-                block.style.outlineOffset = '';
-            });
+            container
+                .querySelectorAll('.mason-drop-zone.active')
+                .forEach((zone) => {
+                    zone.classList.remove('active')
+                })
+            container.querySelectorAll('.mason-block').forEach((block) => {
+                block.style.outline = ''
+                block.style.outlineOffset = ''
+            })
 
-            draggedBlock = null;
-            draggedBlockIndex = null;
-            dragOverIndex = null;
-        });
+            draggedBlock = null
+            draggedBlockIndex = null
+            dragOverIndex = null
+        })
 
         // Handle drag over for drop zones (inserting new blocks from sidebar)
-        container.addEventListener('dragover', function(e) {
-            e.preventDefault();
+        container.addEventListener('dragover', function (e) {
+            e.preventDefault()
 
             // Check if this is a block being repositioned
             if (draggedBlockIndex !== null) {
                 // Handle block repositioning
-                const dropZone = e.target.closest('.mason-drop-zone');
-                const block = e.target.closest('.mason-block');
+                const dropZone = e.target.closest('.mason-drop-zone')
+                const block = e.target.closest('.mason-block')
 
                 if (dropZone) {
                     // Clear all active zones
-                    container.querySelectorAll('.mason-drop-zone.active').forEach(zone => {
-                        zone.classList.remove('active');
-                    });
+                    container
+                        .querySelectorAll('.mason-drop-zone.active')
+                        .forEach((zone) => {
+                            zone.classList.remove('active')
+                        })
 
-                    const targetIndex = parseInt(dropZone.getAttribute('data-drop-index'));
+                    const targetIndex = parseInt(
+                        dropZone.getAttribute('data-drop-index'),
+                    )
 
                     // Don't highlight if dropping at same position or immediately after
                     // Allow dropping at index 0 (before first block)
-                    if (!isNaN(targetIndex) && targetIndex !== draggedBlockIndex && targetIndex !== draggedBlockIndex + 1) {
-                        dropZone.classList.add('active');
-                        dragOverIndex = targetIndex;
+                    if (
+                        !isNaN(targetIndex) &&
+                        targetIndex !== draggedBlockIndex &&
+                        targetIndex !== draggedBlockIndex + 1
+                    ) {
+                        dropZone.classList.add('active')
+                        dragOverIndex = targetIndex
                     }
                 } else if (block) {
                     // Allow dropping on blocks (will insert after)
-                    const blockIndex = parseInt(block.getAttribute('data-block-index'));
+                    const blockIndex = parseInt(
+                        block.getAttribute('data-block-index'),
+                    )
                     if (blockIndex !== draggedBlockIndex) {
-                        block.style.outline = '2px dashed #0ea5e9';
-                        block.style.outlineOffset = '2px';
+                        block.style.outline = '2px dashed #0ea5e9'
+                        block.style.outlineOffset = '2px'
                     }
                 }
             } else {
                 // Handle inserting new blocks from sidebar
-                const dropZone = e.target.closest('.mason-drop-zone');
+                const dropZone = e.target.closest('.mason-drop-zone')
                 if (dropZone) {
-                    dropZone.classList.add('active');
-                    dragOverIndex = parseInt(dropZone.getAttribute('data-drop-index'));
+                    dropZone.classList.add('active')
+                    dragOverIndex = parseInt(
+                        dropZone.getAttribute('data-drop-index'),
+                    )
                 }
             }
-        });
+        })
 
-        container.addEventListener('dragleave', function(e) {
-            const dropZone = e.target.closest('.mason-drop-zone');
-            const block = e.target.closest('.mason-block');
+        container.addEventListener('dragleave', function (e) {
+            const dropZone = e.target.closest('.mason-drop-zone')
+            const block = e.target.closest('.mason-block')
 
             if (dropZone) {
-                dropZone.classList.remove('active');
+                dropZone.classList.remove('active')
             }
 
             if (block && draggedBlockIndex !== null) {
-                block.style.outline = '';
-                block.style.outlineOffset = '';
+                block.style.outline = ''
+                block.style.outlineOffset = ''
             }
-        });
+        })
 
-        container.addEventListener('drop', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        container.addEventListener('drop', function (e) {
+            e.preventDefault()
+            e.stopPropagation()
 
             // Clear all active zones and outlines
-            container.querySelectorAll('.mason-drop-zone.active').forEach(zone => {
-                zone.classList.remove('active');
-            });
-            container.querySelectorAll('.mason-block').forEach(block => {
-                block.style.outline = '';
-                block.style.outlineOffset = '';
-            });
+            container
+                .querySelectorAll('.mason-drop-zone.active')
+                .forEach((zone) => {
+                    zone.classList.remove('active')
+                })
+            container.querySelectorAll('.mason-block').forEach((block) => {
+                block.style.outline = ''
+                block.style.outlineOffset = ''
+            })
 
             if (draggedBlockIndex !== null) {
                 // Handle block repositioning
                 // Try to find drop zone first (more precise)
-                let dropZone = e.target.closest('.mason-drop-zone');
+                let dropZone = e.target.closest('.mason-drop-zone')
                 // If not found, check if we're over a drop zone element directly
-                if (!dropZone && e.target.classList.contains('mason-drop-zone')) {
-                    dropZone = e.target;
+                if (
+                    !dropZone &&
+                    e.target.classList.contains('mason-drop-zone')
+                ) {
+                    dropZone = e.target
                 }
 
-                const block = e.target.closest('.mason-block');
+                const block = e.target.closest('.mason-block')
 
-                let targetIndex = null;
+                let targetIndex = null
 
                 if (dropZone) {
-                    const dropIndex = parseInt(dropZone.getAttribute('data-drop-index'));
+                    const dropIndex = parseInt(
+                        dropZone.getAttribute('data-drop-index'),
+                    )
                     if (!isNaN(dropIndex)) {
                         // Drop zone index represents insertion position in the original array
-                        targetIndex = dropIndex;
+                        targetIndex = dropIndex
                     }
                 } else if (block) {
                     // Dropping on a block - insert after it
-                    const blockIndex = parseInt(block.getAttribute('data-block-index'));
+                    const blockIndex = parseInt(
+                        block.getAttribute('data-block-index'),
+                    )
                     if (!isNaN(blockIndex)) {
-                        targetIndex = blockIndex + 1;
+                        targetIndex = blockIndex + 1
                     }
                 }
 
                 // Prevent dropping at the same position
-                if (targetIndex !== null && !isNaN(targetIndex) && targetIndex !== draggedBlockIndex) {
-                    const allBlocks = container.querySelectorAll('.mason-block');
-                    const totalBlocks = allBlocks.length;
+                if (
+                    targetIndex !== null &&
+                    !isNaN(targetIndex) &&
+                    targetIndex !== draggedBlockIndex
+                ) {
+                    const allBlocks = container.querySelectorAll('.mason-block')
+                    const totalBlocks = allBlocks.length
 
                     // Send the target index as position in the original array
                     // handleMoveBlock will adjust for the removal
                     if (targetIndex >= 0 && targetIndex <= totalBlocks) {
-                        window.parent.postMessage({
-                            type: 'moveBlockRequest',
-                            from: draggedBlockIndex,
-                            to: targetIndex
-                        }, '*');
+                        window.parent.postMessage(
+                            {
+                                type: 'moveBlockRequest',
+                                from: draggedBlockIndex,
+                                to: targetIndex,
+                            },
+                            '*',
+                        )
                     }
                 }
 
                 // Reset drag state
-                draggedBlockIndex = null;
-                draggedBlock = null;
+                draggedBlockIndex = null
+                draggedBlock = null
             } else {
                 // Handle inserting new blocks from sidebar
-                const dropZone = e.target.closest('.mason-drop-zone');
+                const dropZone = e.target.closest('.mason-drop-zone')
                 if (dropZone) {
-                    const position = parseInt(dropZone.getAttribute('data-drop-index'));
-                    const brickId = e.dataTransfer.getData('brick');
+                    const position = parseInt(
+                        dropZone.getAttribute('data-drop-index'),
+                    )
+                    const brickId = e.dataTransfer.getData('brick')
 
                     if (brickId && !isNaN(position)) {
-                        window.parent.postMessage({
-                            type: 'insertBlockRequest',
-                            brickId,
-                            position
-                        }, '*');
+                        window.parent.postMessage(
+                            {
+                                type: 'insertBlockRequest',
+                                brickId,
+                                position,
+                            },
+                            '*',
+                        )
                     }
                 }
             }
-        });
-    })();
+        })
+    })()
 </script>
