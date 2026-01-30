@@ -94,3 +94,17 @@ body {
         margin-bottom: -2rem;
     }
 }
+.mason-unregistered-brick {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--mason-unregistered-brick-background, #fecaca);
+    color: var(--mason-unregistered-brick-text, #450a0a);
+    padding: 1rem;
+
+    > .fi-icon {
+        color: var(--mason-unregistered-brick-icon, #dc2626);
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+}

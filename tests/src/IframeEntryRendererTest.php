@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Awcodes\Mason\Support\IframeRenderer;
+use Awcodes\Mason\Support\IframeEntryRenderer;
 use Awcodes\Mason\Tests\Fixtures\SimpleBrick;
 use Awcodes\Mason\Tests\Fixtures\TestBrick;
 
@@ -18,20 +18,20 @@ beforeEach(function () {
     }
 });
 
-describe('IframeRenderer', function () {
+describe('IframeEntryRenderer', function () {
     describe('make()', function () {
         it('creates instance with blocks', function () {
             $blocks = [
                 ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => []]],
             ];
-            $renderer = IframeRenderer::make($blocks);
+            $renderer = IframeEntryRenderer::make($blocks);
 
-            expect($renderer)->toBeInstanceOf(IframeRenderer::class)
+            expect($renderer)->toBeInstanceOf(IframeEntryRenderer::class)
                 ->and($renderer->getBlocks())->toBe($blocks);
         });
 
         it('creates instance with empty blocks', function () {
-            $renderer = IframeRenderer::make([]);
+            $renderer = IframeEntryRenderer::make([]);
 
             expect($renderer->getBlocks())->toBe([]);
         });
@@ -42,7 +42,7 @@ describe('IframeRenderer', function () {
             $blocks = [
                 ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => []]],
             ];
-            $renderer = IframeRenderer::make([])
+            $renderer = IframeEntryRenderer::make([])
                 ->setBlocks($blocks);
 
             expect($renderer->getBlocks())->toBe($blocks);
@@ -56,7 +56,7 @@ describe('IframeRenderer', function () {
                 ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => ['title' => 'New']]],
             ];
 
-            $renderer = IframeRenderer::make($originalBlocks)
+            $renderer = IframeEntryRenderer::make($originalBlocks)
                 ->setBlocks($newBlocks);
 
             expect($renderer->getBlocks())->toBe($newBlocks);
@@ -66,7 +66,7 @@ describe('IframeRenderer', function () {
     describe('getBlockHtml()', function () {
         it('returns HTML for registered brick', function () {
             $block = ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => ['title' => 'Hello']]];
-            $renderer = IframeRenderer::make([$block])
+            $renderer = IframeEntryRenderer::make([$block])
                 ->bricks([TestBrick::class]);
 
             $html = $renderer->getBlockHtml($block);
@@ -76,7 +76,7 @@ describe('IframeRenderer', function () {
 
         it('returns null for non-masonBrick type', function () {
             $block = ['type' => 'paragraph', 'content' => 'text'];
-            $renderer = IframeRenderer::make([$block])
+            $renderer = IframeEntryRenderer::make([$block])
                 ->bricks([TestBrick::class]);
 
             expect($renderer->getBlockHtml($block))->toBeNull();
@@ -84,7 +84,7 @@ describe('IframeRenderer', function () {
 
         it('returns null for blank id', function () {
             $block = ['type' => 'masonBrick', 'attrs' => ['id' => '', 'config' => []]];
-            $renderer = IframeRenderer::make([$block])
+            $renderer = IframeEntryRenderer::make([$block])
                 ->bricks([TestBrick::class]);
 
             expect($renderer->getBlockHtml($block))->toBeNull();
@@ -92,7 +92,7 @@ describe('IframeRenderer', function () {
 
         it('returns null for missing id', function () {
             $block = ['type' => 'masonBrick', 'attrs' => ['config' => []]];
-            $renderer = IframeRenderer::make([$block])
+            $renderer = IframeEntryRenderer::make([$block])
                 ->bricks([TestBrick::class]);
 
             expect($renderer->getBlockHtml($block))->toBeNull();
@@ -100,7 +100,7 @@ describe('IframeRenderer', function () {
 
         it('returns unregistered brick view for unregistered brick', function () {
             $block = ['type' => 'masonBrick', 'attrs' => ['id' => 'unknown-brick', 'config' => []]];
-            $renderer = IframeRenderer::make([$block])
+            $renderer = IframeEntryRenderer::make([$block])
                 ->bricks([TestBrick::class]);
 
             expect($renderer->getBlockHtml($block))->toContain('unknown-brick')
@@ -109,7 +109,7 @@ describe('IframeRenderer', function () {
 
         it('uses empty config when not provided', function () {
             $block = ['type' => 'masonBrick', 'attrs' => ['id' => 'simple-brick']];
-            $renderer = IframeRenderer::make([$block])
+            $renderer = IframeEntryRenderer::make([$block])
                 ->bricks([SimpleBrick::class]);
 
             $html = $renderer->getBlockHtml($block);
@@ -123,7 +123,7 @@ describe('IframeRenderer', function () {
             $blocks = [
                 ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => ['title' => 'Hello']]],
             ];
-            $renderer = IframeRenderer::make($blocks)
+            $renderer = IframeEntryRenderer::make($blocks)
                 ->bricks([TestBrick::class]);
 
             $html = $renderer->toHtml();
@@ -137,7 +137,7 @@ describe('IframeRenderer', function () {
                 ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => ['title' => 'First']]],
                 ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => ['title' => 'Second']]],
             ];
-            $renderer = IframeRenderer::make($blocks)
+            $renderer = IframeEntryRenderer::make($blocks)
                 ->bricks([TestBrick::class]);
 
             $html = $renderer->toHtml();
@@ -146,55 +146,41 @@ describe('IframeRenderer', function () {
                 ->and($html)->toContain('Second');
         });
 
-        it('renders empty state', function () {
-            $renderer = IframeRenderer::make([])
+        it('renders empty state with message', function () {
+            $renderer = IframeEntryRenderer::make([])
                 ->bricks([TestBrick::class]);
 
             $html = $renderer->toHtml();
 
-            expect($html)->toBeString();
+            expect($html)->toBeString()
+                ->and($html)->toContain('mason-entry-empty');
         });
 
-        it('includes block labels', function () {
+        it('does not include edit controls', function () {
             $blocks = [
                 ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => []]],
             ];
-            $renderer = IframeRenderer::make($blocks)
+            $renderer = IframeEntryRenderer::make($blocks)
                 ->bricks([TestBrick::class]);
 
             $html = $renderer->toHtml();
 
-            // The label should appear somewhere in the rendered output
-            expect($html)->toBeString();
-        });
-    });
-
-    describe('getBlockLabel()', function () {
-        it('returns Unknown Brick for blank id', function () {
-            $blocks = [
-                ['type' => 'masonBrick', 'attrs' => ['id' => '', 'config' => []]],
-            ];
-            $renderer = IframeRenderer::make($blocks)
-                ->bricks([TestBrick::class]);
-
-            // Access the protected method indirectly via toHtml
-            $html = $renderer->toHtml();
-
-            // The label will be in the rendered output
-            expect($html)->toBeString();
+            expect($html)->not->toContain('mason-block-controls')
+                ->and($html)->not->toContain('data-action="edit"')
+                ->and($html)->not->toContain('data-action="delete"')
+                ->and($html)->not->toContain('mason-drop-zone');
         });
 
-        it('returns brick label for registered brick', function () {
+        it('uses mason-entry-block class', function () {
             $blocks = [
                 ['type' => 'masonBrick', 'attrs' => ['id' => 'test-brick', 'config' => []]],
             ];
-            $renderer = IframeRenderer::make($blocks)
+            $renderer = IframeEntryRenderer::make($blocks)
                 ->bricks([TestBrick::class]);
 
             $html = $renderer->toHtml();
 
-            // Test Brick's label is "Test Brick"
-            expect($html)->toBeString();
+            expect($html)->toContain('mason-entry-block');
         });
     });
 });

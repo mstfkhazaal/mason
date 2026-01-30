@@ -72,7 +72,7 @@ class MasonRenderer implements Htmlable
 
             $brickHtml = $this->getBrickHtml($id, $config);
 
-            if ($brickHtml) {
+            if ($brickHtml !== '' && $brickHtml !== '0') {
                 $html[] = $brickHtml;
             }
         }
@@ -104,7 +104,7 @@ class MasonRenderer implements Htmlable
     /**
      * @param  array<string, mixed>  $config
      */
-    public function getBrickHtml(string $id, array $config): ?string
+    public function getBrickHtml(string $id, array $config): string
     {
         foreach ($this->getBricks() as $brick) {
             if (is_string($brick) && ($brick::getId() === $id)) {
@@ -112,7 +112,8 @@ class MasonRenderer implements Htmlable
             }
         }
 
-        return null;
+        // Missing bricks are silently ignored when rendering content directly
+        return '';
     }
 
     /**

@@ -1,0 +1,40 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family:
+        system-ui,
+        -apple-system,
+        sans-serif;
+}
+.mason-entry-block {
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    cursor: default;
+}
+.mason-entry-block-content {
+    pointer-events: none;
+}
+.mason-entry-empty {
+    min-height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+.mason-unregistered-brick {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: var(--mason-unregistered-brick-background, #fecaca);
+    color: var(--mason-unregistered-brick-text, #450a0a);
+    padding: 1rem;
+
+    > .fi-icon {
+        color: var(--mason-unregistered-brick-icon, #dc2626);
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+}

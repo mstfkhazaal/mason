@@ -27,4 +27,7 @@ return [
         'edit' => 'Edit',
         'delete' => 'Delete',
     ],
+    'entry' => [
+        'empty' => 'No content',
+    ],
 ];

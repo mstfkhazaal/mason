@@ -148,7 +148,7 @@ describe('MasonRenderer', function () {
             expect($html)->toContain('Valid');
         });
 
-        it('skips unregistered bricks', function () {
+        it('silently ignores unregistered bricks', function () {
             $content = [
                 ['type' => 'masonBrick', 'attrs' => ['id' => 'unknown-brick', 'config' => []]],
             ];
@@ -202,10 +202,10 @@ describe('MasonRenderer', function () {
             expect($html)->toContain('Test');
         });
 
-        it('returns null for unregistered brick', function () {
+        it('returns empty string for unregistered brick', function () {
             $renderer = MasonRenderer::make([])->bricks([TestBrick::class]);
 
-            expect($renderer->getBrickHtml('unknown-brick', []))->toBeNull();
+            expect($renderer->getBrickHtml('unknown-brick', []))->toBe('');
         });
     });
 

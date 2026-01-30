@@ -73,7 +73,24 @@ compile({
                 return;
             }
 
-            console.log(`Total file size: ${convertBytes(stats.size)}`);
+            console.log(`mason.js file size: ${convertBytes(stats.size)}`);
+        })
+    }
+})
+
+compile({
+    ...defaultOptions,
+    entryPoints: ['./resources/js/mason-entry.js'],
+    outfile: './resources/dist/mason-entry.js',
+}).then(() => {
+    if (!isDev) {
+        fs.stat('./resources/dist/mason-entry.js', (err, stats) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+
+            console.log(`mason-entry.js file size: ${convertBytes(stats.size)}`);
         })
     }
 })

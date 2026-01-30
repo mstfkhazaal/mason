@@ -69,6 +69,16 @@ class MasonServiceProvider extends PackageServiceProvider
             }
         );
 
+        Blade::directive(
+            name: 'masonEntryStyles',
+            handler: function (): string {
+                $cssPath = __DIR__ . '/../resources/css/entry.css';
+                $css = file_get_contents($cssPath);
+
+                return '<style>' . $css . '</style>';
+            }
+        );
+
         Testable::mixin(new TestsMason);
     }
 
@@ -84,6 +94,7 @@ class MasonServiceProvider extends PackageServiceProvider
     {
         return [
             AlpineComponent::make(id: 'mason', path: __DIR__ . '/../resources/dist/mason.js'),
+            AlpineComponent::make(id: 'mason-entry', path: __DIR__ . '/../resources/dist/mason-entry.js'),
         ];
     }
 }

@@ -43,4 +43,24 @@ describe('MasonEntry', function () {
         expect($entry->getBrick('test-brick'))->toBe(TestBrick::class)
             ->and($entry->getBrick('unknown'))->toBeNull();
     });
+
+    it('returns config default for preview layout by default', function () {
+        $entry = MasonEntry::make('content');
+
+        expect($entry->getPreviewLayout())->toBe(config('mason.entry.layout'));
+    });
+
+    it('can set preview layout', function () {
+        $entry = MasonEntry::make('content')
+            ->previewLayout('custom-layout');
+
+        expect($entry->getPreviewLayout())->toBe('custom-layout');
+    });
+
+    it('can set preview layout using closure', function () {
+        $entry = MasonEntry::make('content')
+            ->previewLayout(fn () => 'dynamic-layout');
+
+        expect($entry->getPreviewLayout())->toBe('dynamic-layout');
+    });
 });

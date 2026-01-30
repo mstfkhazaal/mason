@@ -57,6 +57,9 @@ return [
     'preview' => [
         'layout' => 'mason::iframe-preview',
     ],
+    'entry' => [
+        'layout' => 'mason::iframe-entry',
+    ],
 ];
 ```
 
@@ -67,7 +70,7 @@ return [
 
 ### Form Field
 
-In your Filament forms you should use the `Mason` component. The `Mason` component accepts a `name` prop which should be the name of the field in your model, and requires an array of actions that make up the 'bricks' available to the editor.
+In your Filament forms you should use the `Mason` component. The `Mason` component accepts a `name` prop which should be the name of the field in your model, and requires an array 'bricks' available to the editor.
 
 ```php
 use Awcodes\Mason\Mason;
@@ -93,7 +96,7 @@ Mason::make('content')
     ])
 ```
 
-Then in your layout file you can include the necessary styles and include to render the content correctly.
+Then in your layout file you can include the necessary styles and includes to render the content correctly.
 
 ```blade
 <!DOCTYPE html>
@@ -148,7 +151,7 @@ Mason::make('content')
 
 ### Infolist Entry
 
-In your Filament infolist you should use the `MasonEntry` component. The `Mason` component accepts a `name` prop which should be the name of the field in your model.
+In your Filament infolists you should use the `MasonEntry` component. The `MasonEntry` component accepts a `name` prop which should be the name of the field in your model, and requires an array of 'bricks' available to the entry.
 
 ```php
 use Awcodes\Mason\MasonEntry;
@@ -158,11 +161,53 @@ use Awcodes\Mason\Bricks\Section;
     MasonEntry::make('content')
         ->bricks([
             Section::class,
-        ])
-])            
+        ]),
+])
 ```
 
-### Brick Collections
+#### Entry Preview Layout
+
+Since Mason uses an iframe to render in the infolist, you should set the preview layout for the field to a view in your application that includes your app's styles. This will ensure that the content in the editor looks similar to how it will look on the front end of your site. If all Mason fields in your forms use the same layout, you can set a default in the config file. Otherwise, you can set it per field like so:
+
+```php
+MasonEntry::make('content')
+    ->previewLayout('layouts.app') // your app's layout
+    ->bricks([
+        Section::class,
+    ])
+```
+
+Then in your layout file you can include the necessary styles and includes to render the content correctly.
+
+```blade
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>{{ config('app.name') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+
+        <!-- Styles / Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Mason Entry Styles -->
+        @masonEntryStyles
+    </head>
+    <body>
+        <main>
+            <!-- Include MasonEntry content rendering -->
+            @include('mason::iframe-entry-content', ['blocks' => $blocks])
+        </main>
+    </body>
+</html>
+```
+
+## Brick Collections
 
 To keep from having to repeat yourself when assigning bricks to the editor and the entry, it would help to create sets of bricks that make sense for their use case. Then you can use that in the `bricks` method.
 

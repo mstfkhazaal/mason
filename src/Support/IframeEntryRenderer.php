@@ -7,7 +7,7 @@ namespace Awcodes\Mason\Support;
 use Awcodes\Mason\Concerns\HasBricks;
 use Filament\Support\Concerns\EvaluatesClosures;
 
-class IframeRenderer
+class IframeEntryRenderer
 {
     use EvaluatesClosures;
     use HasBricks;
@@ -93,9 +93,9 @@ class IframeRenderer
         }, $this->blocks, array_keys($this->blocks));
 
         // Use the provided layout, fallback to config, then default
-        $layoutToUse = $layout ?? config('mason.iframe.layout');
+        $layoutToUse = $layout ?? config('mason.iframe-entry.layout');
 
-        // If a layout is configured, use it with the preview content slotted in
+        // If a layout is configured, use it with the entry content slotted in
         if ($layoutToUse) {
             return view($layoutToUse, [
                 'blocks' => $blocks,
@@ -103,7 +103,7 @@ class IframeRenderer
         }
 
         // Otherwise, use the default full HTML document
-        return view('mason::iframe-preview', [
+        return view('mason::iframe-entry', [
             'blocks' => $blocks,
         ])->render();
     }
