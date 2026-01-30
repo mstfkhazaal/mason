@@ -12,6 +12,8 @@ trait HasBricks
 {
     protected array | Closure | null $bricks = null;
 
+    protected ?string $bricksSortDirection = null;
+
     /**
      * @var array<string, class-string<Brick>>
      */
@@ -27,14 +29,37 @@ trait HasBricks
         return $this;
     }
 
+    public function sortBricks(?string $direction = 'asc'): static
+    {
+        $this->bricksSortDirection = $direction;
+
+        return $this;
+    }
+
+    public function getBricksSortDirection(): ?string
+    {
+        return $this->bricksSortDirection;
+    }
+
     /**
      * @return array<class-string<Brick>>
      */
     public function getBricks(): array
     {
-        return $this->evaluate($this->bricks) ?? [
+        $bricks = $this->evaluate($this->bricks) ?? [
             Section::class,
         ];
+
+        if ($this->bricksSortDirection !== null) {
+            usort(
+                $bricks,
+                fn ($a, $b): int => $this->bricksSortDirection === 'asc'
+                ? $a::getLabel() <=> $b::getLabel()
+                : $b::getLabel() <=> $a::getLabel()
+            );
+        }
+
+        return $bricks;
     }
 
     /**

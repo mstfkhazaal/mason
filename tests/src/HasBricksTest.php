@@ -66,6 +66,49 @@ describe('HasBricks trait', function () {
 
             expect($field->getBrick('unknown-brick'))->toBeNull();
         });
+
+        it('sorts bricks ascending by label', function () {
+            $field = Mason::make('content')
+                ->bricks([TestBrick::class, SimpleBrick::class])
+                ->sortBricks('asc');
+
+            $cached = $field->getCachedBricks();
+            $keys = array_keys($cached);
+
+            expect($keys[0])->toBe('simple-brick')
+                ->and($keys[1])->toBe('test-brick');
+        });
+
+        it('sorts bricks descending by label', function () {
+            $field = Mason::make('content')
+                ->bricks([SimpleBrick::class, TestBrick::class])
+                ->sortBricks('desc');
+
+            $cached = $field->getCachedBricks();
+            $keys = array_keys($cached);
+
+            expect($keys[0])->toBe('test-brick')
+                ->and($keys[1])->toBe('simple-brick');
+        });
+
+        it('maintains original order when sorting is not set', function () {
+            $field = Mason::make('content')
+                ->bricks([TestBrick::class, SimpleBrick::class]);
+
+            $cached = $field->getCachedBricks();
+            $keys = array_keys($cached);
+
+            expect($keys[0])->toBe('test-brick')
+                ->and($keys[1])->toBe('simple-brick');
+        });
+
+        it('defaults to ascending when sortBricks is called without argument', function () {
+            $field = Mason::make('content')
+                ->bricks([TestBrick::class, SimpleBrick::class])
+                ->sortBricks();
+
+            expect($field->getBricksSortDirection())->toBe('asc');
+        });
     });
 
     describe('on MasonRenderer', function () {

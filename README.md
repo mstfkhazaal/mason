@@ -91,9 +91,7 @@ Since Mason uses an iframe to render in the editor, you should set the preview l
 ```php
 Mason::make('content')
     ->previewLayout('layouts.mason-preview') // your app's layout
-    ->bricks([
-        Section::class,
-    ])
+    ->bricks([...])
 ```
 
 Then in your layout file you can include the necessary styles and includes to render the content correctly.
@@ -146,9 +144,7 @@ By default, Mason requires you to click the edit button on each brick to edit it
 ```php
 Mason::make('content')
     ->doubleClickToEdit()
-    ->bricks([
-        Section::class,
-    ])
+    ->bricks([...])
 ```
 
 ### Infolist Entry
@@ -174,9 +170,7 @@ Since Mason uses an iframe to render in the infolist, you should set the preview
 ```php
 MasonEntry::make('content')
     ->previewLayout('layouts.mason-entry')
-    ->bricks([
-        Section::class,
-    ])
+    ->bricks([...])
 ```
 
 Then in your layout file you can include the necessary styles and includes to render the content correctly.
@@ -220,15 +214,11 @@ If you find that the default height of the Mason editor or entry is not enough f
 ```php
 Mason::make('content')
     ->extraInputAttributes(['style' => 'min-height: 30rem;'])
-    ->bricks([
-        Section::class,
-    ])
+    ->bricks([...])
 
 MasonEntry::make('content')
     ->extraInputAttributes(['style' => 'min-height: 40rem;'])
-    ->bricks([
-        Section::class,
-    ])
+    ->bricks([...])
 ```
 
 ### Brick Collections
@@ -265,9 +255,28 @@ use Awcodes\Mason\Enums\SidebarPosition;
 
 Mason::make('content')
     ->sidebarPosition(SidebarPosition::Start)
-    ->bricks([
-        Section::class,
-    ])
+    ->bricks([...])
+```
+
+### Sorting Bricks
+
+By default, bricks are sorted in the order they are defined in the `bricks` array. If you would like to allow users to sort the bricks in the editor, you can chain the `sortBricks` method on the field.
+
+```php
+// Sort ascending (A-Z) by label
+Mason::make('content')
+    ->sortBricks('asc')
+    ->bricks([...])
+
+// Or simply (defaults to 'asc')
+Mason::make('content')
+    ->sortBricks()
+    ->bricks([...])
+
+// Sort descending (Z-A) by label
+Mason::make('content')
+    ->sortBricks('desc')
+    ->bricks([...])
 ```
      
 ## Creating Bricks
