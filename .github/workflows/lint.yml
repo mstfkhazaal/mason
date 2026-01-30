@@ -6,7 +6,7 @@ on:
     types:
       - closed
     branches:
-      - 2.x
+      - 3.x
     paths:
       - '**.php'
 
