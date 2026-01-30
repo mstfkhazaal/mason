@@ -288,6 +288,22 @@ Mason::make('content')
     ->sortBricks('desc')
     ->bricks([...])
 ```
+
+### Static Bricks without data or forms
+
+If you would like to create a brick that does not require any data or forms, you can return the view in the `toHtml` method and set the action to have a hidden modal in the `configureBrickAction` method in your brick class. Now, when inserting the brick, it will simply add the brick without any configuration.
+
+```php
+public static function toHtml(array $config, ?array $data = null): ?string
+{
+    return view('mason.static-brick');
+}
+
+public static function configureBrickAction(Action $action): Action
+{
+    return $action->modalHidden();
+}
+```
      
 ## Creating Bricks
 
