@@ -255,6 +255,20 @@ Mason::make('content')
 MasonEntry::make('content')
     ->bricks(BrickCollection::make())
 ```
+
+### Sidebar Position
+
+By default, the Mason editor sidebar is positioned on the right side of the editor. If you would like to position it on the left side, you can chain the `sidebarPosition` method on the field and assign it the new position.
+
+```php
+use Awcodes\Mason\Enums\SidebarPosition;
+
+Mason::make('content')
+    ->sidebarPosition(SidebarPosition::Start)
+    ->bricks([
+        Section::class,
+    ])
+```
      
 ## Creating Bricks
 
