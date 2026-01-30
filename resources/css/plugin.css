@@ -1,4 +1,24 @@
 .mason-wrapper {
+    .mason-topbar {
+        @apply rounded-t-lg shadow-sm ring-1 ring-gray-950/10 transition duration-75 md:hidden dark:ring-white/20;
+
+        + .mason-input-wrapper {
+            @apply rounded-t-none md:rounded-t-lg;
+        }
+    }
+
+    .mason-controls {
+        @apply flex items-center gap-4 px-3 py-3;
+
+        .fi-icon {
+            @apply size-6;
+        }
+
+        .active {
+            @apply text-primary-600 dark:text-primary-500;
+        }
+    }
+
     .mason-input-wrapper {
         @apply overflow-hidden;
 
@@ -15,27 +35,18 @@
             }
 
             .mason-sidebar {
-                @apply hidden h-full max-w-[12rem] shrink-0 flex-col divide-y divide-gray-950/10 border-s border-gray-950/10 bg-gray-50 md:flex dark:divide-white/5 dark:border-white/5 dark:bg-gray-950/20;
-
-                .mason-controls,
-                .mason-actions-bricks {
-                    @apply gap-2 py-2 px-3;
-                }
+                @apply hidden h-full max-w-[13rem] shrink-0 flex-col divide-y divide-gray-950/10 border-s border-gray-950/10 bg-gray-50 md:flex dark:divide-white/20 dark:border-white/5 dark:bg-gray-950/20;
 
                 .mason-controls {
-                    @apply flex items-center;
+                    @apply flex items-center gap-2 px-3 py-2;
 
-                    svg {
+                    .fi-icon {
                         @apply size-5;
-                    }
-
-                    .active {
-                        @apply text-primary-600 dark:text-primary-500;
                     }
                 }
 
                 .mason-actions {
-                    @apply flex flex-1 flex-col divide-y divide-gray-950/10 overflow-hidden dark:divide-white/5;
+                    @apply flex flex-1 flex-col divide-y divide-gray-950/10 overflow-hidden dark:divide-white/20;
 
                     .mason-actions-search {
                         @apply p-0;
@@ -46,7 +57,7 @@
                     }
 
                     .mason-actions-bricks {
-                        @apply flex flex-1 flex-col gap-2 overflow-y-auto;
+                        @apply flex flex-1 flex-col gap-2 overflow-y-auto px-3 py-2;
 
                         .mason-actions-brick {
                             @apply flex cursor-move items-center gap-2 rounded border border-gray-300 bg-white py-2 pe-4 ps-3 text-xs dark:border-gray-700 dark:bg-gray-800;
@@ -119,7 +130,7 @@
 
     &.display-tablet {
         .mason-editor-wrapper .mason-iframe {
-            @apply mx-auto !max-w-screen-md;
+            @apply mx-auto w-[768px] max-w-[768px];
         }
     }
 }

@@ -328,6 +328,11 @@ export default function masonComponent({
         },
 
         toggleViewport(viewport) {
+            if (this.viewport === viewport) {
+                this.viewport = 'desktop'
+                return
+            }
+
             this.viewport = viewport
         },
 

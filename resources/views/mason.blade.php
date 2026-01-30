@@ -41,6 +41,12 @@
         x-on:keydown.escape.window="fullscreen = false"
         x-on:click.away="deselectAllBlocks()"
     >
+        @if (! $isDisabled)
+            <div class="mason-topbar">
+                <x-mason::controls />
+            </div>
+        @endif
+
         <x-filament::input.wrapper
             :valid="! $errors->has($statePath)"
             :attributes="

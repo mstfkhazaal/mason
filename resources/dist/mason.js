@@ -205,6 +205,10 @@ function g({
                 this.fullscreen || (this.viewport = 'desktop'))
         },
         toggleViewport(e) {
+            if (this.viewport === e) {
+                this.viewport = 'desktop'
+                return
+            }
             this.viewport = e
         },
         toggleSidebar() {
