@@ -130,10 +130,10 @@ If the blue color used in the editor doesn't work with your design, you can cust
 
 ```css
 #mason-preview-container {
-    --mason-border-color: var(--color-primary-500, #0ea5e9);
+    --mason-border-color: rgb(236, 72, 153);
     --mason-controls-background: rgba(0, 0, 0, 0.8);
     --mason-button-hover-background: rgba(255, 255, 255, 0.2);
-    --mason-dropzone-background: rgba(14, 165, 233, 0.1);
+    --mason-drop-zone-background: rgba(236, 72, 153, 0.5);
 }
 ```
 

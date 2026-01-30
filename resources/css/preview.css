@@ -93,6 +93,11 @@ body {
         margin-top: 0;
         margin-bottom: -2rem;
     }
+
+    &:last-of-type {
+        margin-top: -2rem;
+        margin-bottom: 0;
+    }
 }
 .mason-unregistered-brick {
     display: flex;
