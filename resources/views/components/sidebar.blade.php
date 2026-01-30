@@ -1,12 +1,19 @@
 @props([
     'bricks' => [],
+    '$hasGridActions' => false,
 ])
 
 @php
     $brickIds = array_map(fn ($brick) => $brick::getLabel(), $bricks);
 @endphp
 
-<div class="mason-sidebar" {{ $attributes }}>
+<div
+    @class([
+        'mason-sidebar',
+        'has-grid-actions' => $hasGridActions,
+    ])
+    {{ $attributes }}
+>
     <div class="mason-controls">
         <x-filament::icon-button
             color="gray"
@@ -116,7 +123,8 @@
             @foreach ($bricks as $brick)
                 <div
                     draggable="true"
-                    x-on:dragstart="$event.dataTransfer.setData('brick', @js($brick::getId()))"
+                    x-on:dragstart="$event.dataTransfer.setData('brick', @js($brick::getId())); $el.classList.add('dragging')"
+                    x-on:dragend="$el.classList.remove('dragging');"
                     class="mason-actions-brick"
                     x-on:open-modal.window="isLoading = false"
                     x-on:run-mason-commands.window="isLoading = false"

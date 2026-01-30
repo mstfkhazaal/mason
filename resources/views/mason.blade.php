@@ -76,6 +76,7 @@
                 @if (! $isDisabled && filled($bricks))
                     <x-mason::sidebar
                         :bricks="$bricks"
+                        :has-grid-actions="$hasGridActions()"
                         wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}"
                     />
                 @endif

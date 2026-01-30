@@ -28,7 +28,7 @@ composer require awcodes/mason
 In an effort to align with Filament's theming methodology, you will need to use a custom theme to use this plugin.
 
 > [!IMPORTANT]
-> If you have not set up a custom theme and are using Filament Panels, follow the instructions in the [Filament Docs](https://filamentphp.com/docs/5.x/styling/overview#creating-a-custom-theme) first. The following applies to both the Panels Package and the standalone Tables package.
+> If you have not set up a custom theme and are using Filament Panels, follow the instructions in the [Filament Docs](https://filamentphp.com/docs/5.x/styling/overview#creating-a-custom-theme) first. The following applies to both the Panels Package and the standalone Forms package.
 
 After setting up a custom theme, add the plugin's CSS to your theme CSS file or your app's CSS file if using the standalone forms package.
 
@@ -66,7 +66,7 @@ return [
 ## Usage
 
 > [!IMPORTANT]
-> Mason uses JSON to store its data in the database, so it is important that you cast the field to either 'array' or 'json' on your model and recommend to store the content as a `longText` column in the database.
+> Mason uses JSON to store its data in the database, so it is important that you cast the field to either 'array' or 'json' on your model, and it's recommended to store the content as a `longText` column in the database.
 
 ### Form Field
 
@@ -255,6 +255,16 @@ use Awcodes\Mason\Enums\SidebarPosition;
 
 Mason::make('content')
     ->sidebarPosition(SidebarPosition::Start)
+    ->bricks([...])
+```
+
+### Displaying Brick Actions as a Grid
+
+By default, the Mason editor displays the brick actions in a list. If you would like to display them in a grid format, you can chain the `displayActionsAsGrid` method on the field.
+
+```php
+Mason::make('content')
+    ->displayActionsAsGrid()
     ->bricks([...])
 ```
 

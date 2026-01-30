@@ -14,6 +14,8 @@ trait HasSidebar
 
     protected SidebarPosition | Closure | null $sidebarPosition = null;
 
+    protected bool | Closure | null $hasGridActions = null;
+
     /**
      * @param  array<Action> | Closure  $actions
      */
@@ -31,6 +33,13 @@ trait HasSidebar
         return $this;
     }
 
+    public function displayActionsAsGrid(bool | Closure $condition = true): static
+    {
+        $this->hasGridActions = $condition;
+
+        return $this;
+    }
+
     /**
      * @return array<Action>
      */
@@ -42,5 +51,10 @@ trait HasSidebar
     public function getSidebarPosition(): SidebarPosition
     {
         return $this->evaluate($this->sidebarPosition) ?? SidebarPosition::End;
+    }
+
+    public function hasGridActions(): bool
+    {
+        return $this->evaluate($this->hasGridActions) ?? false;
     }
 }
