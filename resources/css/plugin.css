@@ -110,7 +110,7 @@
 
 .mason-entry-wrapper {
     .mason {
-        @apply w-full h-full overflow-hidden rounded-lg border border-gray-950/10 dark:border-white/5;
+        @apply h-full w-full overflow-hidden rounded-lg border border-gray-950/10 dark:border-white/5;
 
         .mason-entry-iframe {
             @apply min-h-[30rem] w-full border-0;

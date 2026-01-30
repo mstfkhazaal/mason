@@ -13,24 +13,28 @@
         @else
             x-load
         @endif
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('mason-entry', 'awcodes/mason') }}"
+        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc("mason-entry", "awcodes/mason") }}"
         x-data="masonEntryComponent({
-            state: @js($state),
-            bricks: @js(array_map(fn ($brick) => is_string($brick) ? $brick : get_class($brick), $bricks)),
-            previewLayout: @js($getPreviewLayout()),
-        })"
-        id="{{ 'mason-entry-wrapper-' . $statePath }}"
+                    state: @js($state),
+                    bricks: @js(array_map(fn ($brick) => is_string($brick) ? $brick : get_class($brick), $bricks)),
+                    previewLayout: @js($getPreviewLayout()),
+                })"
+        id="{{ "mason-entry-wrapper-" . $statePath }}"
         {{
             \Filament\Support\prepare_inherited_attributes($getExtraAttributeBag())->class([
-                'mason-entry-wrapper',
+                "mason-entry-wrapper",
             ])
         }}
     >
         <div class="mason">
             <iframe
                 x-ref="entryIframe"
-                name="{{ 'mason-entry-iframe-' . $statePath }}"
-                class="mason-entry-iframe"
+                name="{{ "mason-entry-iframe-" . $statePath }}"
+                {{
+                    \Filament\Support\prepare_inherited_attributes($getExtraInputAttributeBag())->class([
+                        "mason-entry-iframe",
+                    ])
+                }}
             ></iframe>
         </div>
     </div>

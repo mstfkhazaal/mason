@@ -61,36 +61,28 @@ const defaultOptions = {
     }],
 }
 
-compile({
-    ...defaultOptions,
-    entryPoints: ['./resources/js/index.js'],
-    outfile: './resources/dist/mason.js',
-}).then(() => {
-    if (!isDev) {
-        fs.stat('./resources/dist/mason.js', (err, stats) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
+const scripts = [
+    'mason',
+    'mason-entry',
+]
 
-            console.log(`mason.js file size: ${convertBytes(stats.size)}`);
-        })
-    }
-})
+scripts.forEach((script) => {
+    compile({
+        ...defaultOptions,
+        entryPoints: [`./resources/js/${script}.js`],
+        outfile: `./resources/dist/${script}.js`,
+    }).then(() => {
+        if (!isDev) {
+            fs.stat(`./resources/dist/${script}.js`, (err, stats) => {
+                if (err) {
+                    console.log(err)
+                    return
+                }
 
-compile({
-    ...defaultOptions,
-    entryPoints: ['./resources/js/mason-entry.js'],
-    outfile: './resources/dist/mason-entry.js',
-}).then(() => {
-    if (!isDev) {
-        fs.stat('./resources/dist/mason-entry.js', (err, stats) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-
-            console.log(`mason-entry.js file size: ${convertBytes(stats.size)}`);
-        })
-    }
+                console.log(
+                    `${script}.js file size: ${convertBytes(stats.size)}`,
+                )
+            })
+        }
+    })
 })

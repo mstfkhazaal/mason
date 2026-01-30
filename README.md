@@ -90,7 +90,7 @@ Since Mason uses an iframe to render in the editor, you should set the preview l
 
 ```php
 Mason::make('content')
-    ->previewLayout('layouts.app') // your app's layout
+    ->previewLayout('layouts.mason-preview') // your app's layout
     ->bricks([
         Section::class,
     ])
@@ -99,6 +99,8 @@ Mason::make('content')
 Then in your layout file you can include the necessary styles and includes to render the content correctly.
 
 ```blade
+// resources/views/layouts/mason-preview.blade.php
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -171,7 +173,7 @@ Since Mason uses an iframe to render in the infolist, you should set the preview
 
 ```php
 MasonEntry::make('content')
-    ->previewLayout('layouts.app') // your app's layout
+    ->previewLayout('layouts.mason-entry')
     ->bricks([
         Section::class,
     ])
@@ -180,6 +182,8 @@ MasonEntry::make('content')
 Then in your layout file you can include the necessary styles and includes to render the content correctly.
 
 ```blade
+// resources/views/layouts/mason-entry.blade.php
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -207,7 +211,27 @@ Then in your layout file you can include the necessary styles and includes to re
 </html>
 ```
 
-## Brick Collections
+## Tips & Tricks
+
+### Custom Height
+
+If you find that the default height of the Mason editor or entry is not enough for your use case, you can customize using Filament's default `->extraInputAttrbutes()` method on both the `Mason` field and the `MasonEntry` component.
+
+```php
+Mason::make('content')
+    ->extraInputAttributes(['style' => 'min-height: 30rem;'])
+    ->bricks([
+        Section::class,
+    ])
+
+MasonEntry::make('content')
+    ->extraInputAttributes(['style' => 'min-height: 40rem;'])
+    ->bricks([
+        Section::class,
+    ])
+```
+
+### Brick Collections
 
 To keep from having to repeat yourself when assigning bricks to the editor and the entry, it would help to create sets of bricks that make sense for their use case. Then you can use that in the `bricks` method.
 
