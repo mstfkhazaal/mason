@@ -33,6 +33,10 @@ class Mason extends Field implements CanBeLengthConstrained
 
     protected string | Closure | null $previewLayout = null;
 
+    protected string | Closure | null $defaultColorMode = null;
+
+    protected bool | Closure $showColorModeToggle = false;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -135,6 +139,30 @@ class Mason extends Field implements CanBeLengthConstrained
     public function getPreviewLayout(): ?string
     {
         return $this->evaluate($this->previewLayout) ?? config('mason.preview.layout');
+    }
+
+    public function defaultColorMode(string | Closure | null $mode): static
+    {
+        $this->defaultColorMode = $mode;
+
+        return $this;
+    }
+
+    public function getDefaultColorMode(): string
+    {
+        return $this->evaluate($this->defaultColorMode) ?? 'light';
+    }
+
+    public function colorModeToggle(bool | Closure $condition = true): static
+    {
+        $this->showColorModeToggle = $condition;
+
+        return $this;
+    }
+
+    public function hasColorModeToggle(): bool
+    {
+        return (bool) $this->evaluate($this->showColorModeToggle);
     }
 
     /**

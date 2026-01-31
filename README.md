@@ -304,6 +304,23 @@ public static function configureBrickAction(Action $action): Action
     return $action->modalHidden();
 }
 ```
+
+### Light / Dark Mode
+
+If your application supports light and dark mode, you can optionally add support for it in the Mason editor by using the `colorModeToggle` method on the field. This will add a toggle button to the editor sidebar that allows users to switch between light and dark mode. You can also use the `defaultColorMode` method to set the default color mode for the editor. One thing to note is that `defaultColorMode` only sets the initial mode when the editor is loaded. If the user switches modes, their preference will be saved in local storage for future visits.
+
+In order for this to work properly, you will need to ensure that your application's CSS supports manually setting light and dark mode according to the Tailwind CSS documentation on [manually controlling color mode](https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually).
+
+```css
+@custom-variant dark (&:where(.dark, .dark *));
+```
+
+```php
+Mason::make('content')
+    ->colorModeToggle()
+    ->defaultColorMode('dark')
+    ->bricks([...])
+``` 
      
 ## Creating Bricks
 

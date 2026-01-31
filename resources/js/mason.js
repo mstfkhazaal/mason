@@ -6,6 +6,8 @@ export default function masonComponent({
     dblClickToEdit,
     bricks = [],
     previewLayout = null,
+    defaultColorMode = 'light',
+    hasColorModeToggle = false,
 }) {
     let iframe = null
     let eventListeners = []
@@ -18,10 +20,22 @@ export default function masonComponent({
         fullscreen: false,
         viewport: 'desktop',
         sidebarOpen: true,
+        colorMode: hasColorModeToggle
+            ? localStorage.getItem('mason-color-mode') || defaultColorMode
+            : defaultColorMode,
         isUpdatingBrick: false,
         isInsertingBrick: false,
         previewUrl: null,
         previewLayout: previewLayout,
+        brickPickerOpen: false,
+        brickPickerBlockIndex: null,
+        brickPickerPosition: 'below',
+
+        // Undo/Redo state
+        undoStack: [],
+        redoStack: [],
+        maxHistorySize: 20,
+        isUndoRedoOperation: false,
 
         async init() {
             // Wait for iframe to load
@@ -42,6 +56,12 @@ export default function masonComponent({
                             blocks: this.getBlocksFromState(),
                             dblClickToEdit: dblClickToEdit,
                             disabled: disabled,
+                        })
+
+                        // Send initial color mode to iframe
+                        this.sendMessageToIframe({
+                            type: 'setColorMode',
+                            mode: this.colorMode,
                         })
 
                         // Update move buttons after iframe loads
@@ -83,11 +103,64 @@ export default function masonComponent({
                     case 'moveBlockRequest':
                         this.handleMoveBlock(data.from, data.to)
                         break
+                    case 'openBrickPicker':
+                        this.openBrickPicker(data.blockIndex)
+                        break
+                    case 'keyboardShortcut':
+                        const isMac =
+                            navigator.platform.toUpperCase().indexOf('MAC') >= 0
+                        const cmdOrCtrl = isMac ? data.metaKey : data.ctrlKey
+                        if (cmdOrCtrl && !data.altKey) {
+                            if (data.key === 'z' || data.key === 'Z') {
+                                data.shiftKey ? this.redo() : this.undo()
+                            } else if (
+                                (data.key === 'y' || data.key === 'Y') &&
+                                !data.shiftKey
+                            ) {
+                                this.redo()
+                            }
+                        }
+                        break
                 }
             }
 
             window.addEventListener('message', messageHandler)
             eventListeners.push(['message', messageHandler])
+
+            // Keyboard shortcuts for undo/redo
+            const keyboardHandler = (event) => {
+                const activeElement = document.activeElement
+                const isInputFocused =
+                    activeElement &&
+                    (activeElement.tagName === 'INPUT' ||
+                        activeElement.tagName === 'TEXTAREA' ||
+                        activeElement.isContentEditable)
+                if (isInputFocused) return
+
+                const isMac =
+                    navigator.platform.toUpperCase().indexOf('MAC') >= 0
+                const cmdOrCtrl = isMac ? event.metaKey : event.ctrlKey
+
+                if (cmdOrCtrl && !event.altKey) {
+                    if (event.key === 'z' || event.key === 'Z') {
+                        event.preventDefault()
+                        if (event.shiftKey) {
+                            this.redo()
+                        } else {
+                            this.undo()
+                        }
+                    } else if (
+                        (event.key === 'y' || event.key === 'Y') &&
+                        !event.shiftKey
+                    ) {
+                        event.preventDefault()
+                        this.redo()
+                    }
+                }
+            }
+
+            window.addEventListener('keydown', keyboardHandler)
+            eventListeners.push(['keydown', keyboardHandler])
 
             // Watch for state changes
             this.$watch('state', () => {
@@ -183,6 +256,7 @@ export default function masonComponent({
 
         async handleInsertBlock(brickId, position) {
             this.isInsertingBrick = true
+            const preInsertState = this.captureState()
 
             try {
                 await this.$wire.mountAction(
@@ -190,6 +264,7 @@ export default function masonComponent({
                     { id: brickId, dragPosition: position, mode: 'insert' },
                     { schemaComponent: key },
                 )
+                this.pushToUndoStack(preInsertState)
             } finally {
                 this.isInsertingBrick = false
             }
@@ -197,6 +272,7 @@ export default function masonComponent({
 
         async handleEditBlock({ index, brickId, config }) {
             this.isUpdatingBrick = true
+            const preEditState = this.captureState()
 
             try {
                 await this.$wire.mountAction(
@@ -209,6 +285,7 @@ export default function masonComponent({
                     },
                     { schemaComponent: key },
                 )
+                this.pushToUndoStack(preEditState)
             } finally {
                 this.isUpdatingBrick = false
             }
@@ -218,6 +295,7 @@ export default function masonComponent({
             const blocks = this.getBlocksFromState()
 
             if (index >= 0 && index < blocks.length) {
+                this.pushToUndoStack(this.captureState())
                 // Create a new array without the deleted block
                 const newBlocks = blocks.filter((_, i) => i !== index)
 
@@ -229,6 +307,7 @@ export default function masonComponent({
             const blocks = this.getBlocksFromState()
 
             if (index >= 0 && index < blocks.length) {
+                this.pushToUndoStack(this.captureState())
                 // Create a new array with the updated block
                 const newBlocks = blocks.map((block, i) =>
                     i === index ? brick : block,
@@ -246,6 +325,8 @@ export default function masonComponent({
             // Allow to be up to blocks.length (for moving to the end)
             if (to < 0 || to > blocks.length) return
             if (from === to) return
+
+            this.pushToUndoStack(this.captureState())
 
             // Create a new array with moved block (blocks are already plain from getBlocksFromState)
             const newBlocks = blocks.slice() // Use slice instead of spread for safety
@@ -338,6 +419,17 @@ export default function masonComponent({
 
         toggleSidebar() {
             this.sidebarOpen = !this.sidebarOpen
+        },
+
+        toggleColorMode() {
+            this.colorMode = this.colorMode === 'dark' ? 'light' : 'dark'
+            if (hasColorModeToggle) {
+                localStorage.setItem('mason-color-mode', this.colorMode)
+            }
+            this.sendMessageToIframe({
+                type: 'setColorMode',
+                mode: this.colorMode,
+            })
         },
 
         saveScrollPosition() {
@@ -466,6 +558,85 @@ export default function masonComponent({
         deselectAllBlocks() {
             if (this.isUpdatingBrick) return
             this.sendMessageToIframe({ type: 'deselectAllBlocks' })
+        },
+
+        openBrickPicker(blockIndex) {
+            this.brickPickerBlockIndex = blockIndex
+            this.brickPickerOpen = true
+        },
+
+        closeBrickPicker() {
+            this.brickPickerOpen = false
+            this.brickPickerBlockIndex = null
+            this.brickPickerPosition = 'below'
+        },
+
+        insertFromPicker(brickId) {
+            const position =
+                this.brickPickerPosition === 'above'
+                    ? this.brickPickerBlockIndex
+                    : this.brickPickerBlockIndex + 1
+            this.handleInsertBlock(brickId, position)
+            this.closeBrickPicker()
+        },
+
+        // Undo/Redo methods
+        captureState() {
+            return JSON.parse(JSON.stringify(this.state || []))
+        },
+
+        pushToUndoStack(previousState) {
+            if (this.isUndoRedoOperation) return
+
+            this.undoStack.push(previousState)
+            if (this.undoStack.length > this.maxHistorySize) {
+                this.undoStack.shift()
+            }
+            this.redoStack = []
+        },
+
+        undo() {
+            if (this.undoStack.length === 0) return
+
+            this.redoStack.push(this.captureState())
+            if (this.redoStack.length > this.maxHistorySize) {
+                this.redoStack.shift()
+            }
+
+            const previousState = this.undoStack.pop()
+            this.isUndoRedoOperation = true
+            this.updateStateFromBlocks(previousState)
+            this.isUndoRedoOperation = false
+        },
+
+        redo() {
+            if (this.redoStack.length === 0) return
+
+            this.undoStack.push(this.captureState())
+            if (this.undoStack.length > this.maxHistorySize) {
+                this.undoStack.shift()
+            }
+
+            const nextState = this.redoStack.pop()
+            this.isUndoRedoOperation = true
+            this.updateStateFromBlocks(nextState)
+            this.isUndoRedoOperation = false
+        },
+
+        canUndo() {
+            return this.undoStack.length > 0
+        },
+
+        canRedo() {
+            return this.redoStack.length > 0
+        },
+
+        clearAllBlocks() {
+            if (this.state && this.state.length > 0) {
+                this.pushToUndoStack(this.captureState())
+            }
+            this.state = []
+            this.updateStateFromBlocks([])
         },
 
         destroy() {

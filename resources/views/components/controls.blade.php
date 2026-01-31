@@ -1,7 +1,11 @@
+@props([
+    'hasColorModeToggle' => false,
+])
+
 <div class="mason-controls">
     <x-filament::icon-button
         color="gray"
-        x-on:click="state = []; updateStateFromBlocks([])"
+        x-on:click="clearAllBlocks()"
         size="sm"
         title="Clear all blocks"
     >
@@ -38,6 +42,47 @@
     >
         Tablet
     </x-filament::icon-button>
+    @if ($hasColorModeToggle)
+        <x-filament::icon-button
+            color="gray"
+            x-on:click="toggleColorMode()"
+            size="sm"
+            x-bind:title="colorMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        >
+            <x-slot name="icon">
+                <svg
+                    x-show="colorMode === 'light'"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+                    />
+                </svg>
+
+                <svg
+                    x-show="colorMode === 'dark'"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                    />
+                </svg>
+            </x-slot>
+        </x-filament::icon-button>
+    @endif
+
     <x-filament::icon-button
         type="button"
         color="gray"
@@ -75,18 +120,22 @@
     <x-filament::icon-button
         icon="heroicon-o-arrow-uturn-left"
         color="gray"
-        x-on:click="toggleViewport('desktop')"
+        x-on:click="undo()"
         size="sm"
-        title="Undo"
+        x-bind:disabled="!canUndo()"
+        x-bind:class="{'opacity-50 cursor-not-allowed': !canUndo()}"
+        title="Undo (Ctrl+Z)"
     >
         Undo
     </x-filament::icon-button>
     <x-filament::icon-button
         icon="heroicon-o-arrow-uturn-right"
         color="gray"
-        x-on:click="toggleViewport('desktop')"
+        x-on:click="redo()"
         size="sm"
-        title="Redo"
+        x-bind:disabled="!canRedo()"
+        x-bind:class="{'opacity-50 cursor-not-allowed': !canRedo()}"
+        title="Redo (Ctrl+Y)"
     >
         Redo
     </x-filament::icon-button>

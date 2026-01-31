@@ -8,6 +8,8 @@
     $statePath = $getStatePath();
     $isDisabled = $isDisabled();
     $bricks = $getBricks();
+    $defaultColorMode = $getDefaultColorMode();
+    $hasColorModeToggle = $hasColorModeToggle();
 @endphp
 
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
@@ -28,6 +30,8 @@
                     dblClickToEdit: @js($shouldDblClickToEdit()),
                     bricks: @js(array_map(fn ($brick) => is_string($brick) ? $brick : get_class($brick), $bricks)),
                     previewLayout: @js($getPreviewLayout()),
+                    defaultColorMode: @js($defaultColorMode),
+                    hasColorModeToggle: @js($hasColorModeToggle),
                 })"
         id="{{ "mason-wrapper-" . $statePath }}"
         class="mason-wrapper"
@@ -43,7 +47,9 @@
     >
         @if (! $isDisabled)
             <div class="mason-topbar">
-                <x-mason::controls />
+                <x-mason::controls
+                    :has-color-mode-toggle="$hasColorModeToggle"
+                />
             </div>
         @endif
 
@@ -83,10 +89,15 @@
                     <x-mason::sidebar
                         :bricks="$bricks"
                         :has-grid-actions="$hasGridActions()"
+                        :has-color-mode-toggle="$hasColorModeToggle"
                         wire:key="sidebar-{{ hash('sha256', json_encode($bricks)) }}"
                     />
                 @endif
             </div>
         </x-filament::input.wrapper>
+
+        @if (! $isDisabled && filled($bricks))
+            <x-mason::brick-picker-modal :bricks="$bricks" />
+        @endif
     </div>
 </x-dynamic-component>

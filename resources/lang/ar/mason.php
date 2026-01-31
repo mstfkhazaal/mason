@@ -24,8 +24,14 @@ return [
         'placeholder' => 'قم بإسقاط الكتل هنا',
         'move_up' => 'تحريك لأعلى',
         'move_down' => 'تحريك لأسفل',
+        'add' => 'إضافة مكون',
         'edit' => 'تحرير',
         'delete' => 'حذف',
+    ],
+    'brick_picker' => [
+        'title' => 'إضافة مكون',
+        'insert_above' => 'إدراج فوق',
+        'insert_below' => 'إدراج تحت',
     ],
     'entry' => [
         'empty' => 'لا يوجد محتوى',

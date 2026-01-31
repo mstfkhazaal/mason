@@ -1,6 +1,7 @@
 @props([
     'bricks' => [],
-    '$hasGridActions' => false,
+    'hasGridActions' => false,
+    'hasColorModeToggle' => false,
 ])
 
 @php
@@ -11,10 +12,11 @@
     @class([
         'mason-sidebar',
         'has-grid-actions' => $hasGridActions,
+        'has-color-mode-toggle' => $hasColorModeToggle ?? false,
     ])
     {{ $attributes }}
 >
-    <x-mason::controls />
+    <x-mason::controls :has-color-mode-toggle="$hasColorModeToggle" />
     <div
         class="mason-actions"
         wire:ignore

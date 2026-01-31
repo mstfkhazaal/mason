@@ -71,6 +71,25 @@
                     </button>
                     <button
                         class="mason-block-btn"
+                        title="{{ __('mason::mason.preview.add') }}"
+                        data-action="add"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            class="size-5"
+                        >
+                            <title>
+                                {{ __('mason::mason.preview.add') }}
+                            </title>
+                            <path
+                                d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"
+                            />
+                        </svg>
+                    </button>
+                    <button
+                        class="mason-block-btn"
                         title="Edit"
                         data-action="edit"
                     >
@@ -179,6 +198,13 @@
                 case 'deselectAllBlocks':
                     deselectAllBlocks()
                     break
+                case 'setColorMode':
+                    if (data.mode === 'dark') {
+                        document.documentElement.classList.add('dark')
+                    } else {
+                        document.documentElement.classList.remove('dark')
+                    }
+                    break
             }
         })
 
@@ -186,6 +212,34 @@
         window.addEventListener('load', function () {
             updateAllMoveButtons()
             window.parent.postMessage({ type: 'ready' }, '*')
+        })
+
+        // Forward undo/redo shortcuts to parent
+        window.addEventListener('keydown', function (event) {
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+            const cmdOrCtrl = isMac ? event.metaKey : event.ctrlKey
+
+            if (cmdOrCtrl && !event.altKey) {
+                if (
+                    event.key === 'z' ||
+                    event.key === 'Z' ||
+                    event.key === 'y' ||
+                    event.key === 'Y'
+                ) {
+                    window.parent.postMessage(
+                        {
+                            type: 'keyboardShortcut',
+                            key: event.key,
+                            ctrlKey: event.ctrlKey,
+                            metaKey: event.metaKey,
+                            shiftKey: event.shiftKey,
+                            altKey: event.altKey,
+                        },
+                        '*',
+                    )
+                    event.preventDefault()
+                }
+            }
         })
 
         function updateContent(blocks) {
@@ -357,6 +411,14 @@
                             '*',
                         )
                     }
+                } else if (actionType === 'add') {
+                    window.parent.postMessage(
+                        {
+                            type: 'openBrickPicker',
+                            blockIndex: index,
+                        },
+                        '*',
+                    )
                 }
             } else {
                 // Click on block content - select it

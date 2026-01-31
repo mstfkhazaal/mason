@@ -24,8 +24,14 @@ return [
         'placeholder' => 'Drop blocks here',
         'move_up' => 'Move Up',
         'move_down' => 'Move Down',
+        'add' => 'Add Brick',
         'edit' => 'Edit',
         'delete' => 'Delete',
+    ],
+    'brick_picker' => [
+        'title' => 'Add Brick',
+        'insert_above' => 'Insert above',
+        'insert_below' => 'Insert below',
     ],
     'entry' => [
         'empty' => 'No content',
