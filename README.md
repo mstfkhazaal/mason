@@ -1,4 +1,4 @@
-<img src="https://res.cloudinary.com/aw-codes/image/upload/w_1200,f_auto,q_auto/plugins/mason/awcodes-mason.jpg" alt="mason opengraph image" width="1200" height="auto" class="filament-hidden" style="width: 100%;" />
+<img src="https://res.cloudinary.com/aw-codes/image/upload/w_1200,f_auto,q_auto/thumbnails/awcodes-mason.jpg" alt="mason opengraph image" width="1200" height="auto" class="filament-hidden" style="width: 100%;" />
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/awcodes/mason.svg?style=flat-square)](https://packagist.org/packages/awcodes/mason)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/awcodes/mason/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/awcodes/mason/actions?query=workflow%3Arun-tests+branch%3Amain)
@@ -324,7 +324,7 @@ Mason::make('content')
      
 ## Creating Bricks
 
-Bricks are nothing more than Filament actions that have an associated view that is rendered in the editor with its data.
+Bricks are nothing more than classes that have an associated view that is rendered in the editor with its data.
 
 To help you get started, there is a `make:mason-brick` command that will create a new brick for you with the necessary class and blade template in the paths specified in the config file.
 
