@@ -17,7 +17,9 @@ class IframeRenderer
      */
     public function __construct(protected array $blocks = [])
     {
-        app('debugbar')->disable();
+        if (app()->bound('debugbar')) {
+            app('debugbar')->disable();
+        }
     }
 
     /**
