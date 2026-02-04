@@ -9,6 +9,9 @@
                 align-items: center;
                 justify-content: center;
                 color: #9ca3af;
+                position: absolute;
+                inset: 0;
+                margin: 0;
             "
         >
             {{ __('mason::mason.preview.placeholder') }}
