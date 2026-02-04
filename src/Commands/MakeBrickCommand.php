@@ -71,30 +71,21 @@ class MakeBrickCommand extends Command
                 ->append('.php')
         );
 
-        $previewPath = resource_path(
-            (string) Str::of($view)
-                ->prepend('views/' . $viewsPath . '/')
-                ->replace('.', '/')
-                ->replace('//', '/')
-                ->append('/preview.blade.php')
-        );
-
         $htmlPath = resource_path(
             (string) Str::of($view)
                 ->prepend('views/' . $viewsPath . '/')
                 ->replace('.', '/')
                 ->replace('//', '/')
-                ->append('/index.blade.php')
+                ->append('.blade.php')
         );
 
-        $files = [$classPath, $previewPath, $htmlPath];
+        $files = [$classPath, $htmlPath];
 
         if (! $this->option('force') && $this->checkForCollision($files)) {
             return static::INVALID;
         }
 
         File::ensureDirectoryExists(dirname($classPath));
-        File::ensureDirectoryExists(dirname($previewPath));
         File::ensureDirectoryExists(dirname($htmlPath));
 
         $this->copyStubToApp('brick-class', $classPath, [
@@ -104,11 +95,9 @@ class MakeBrickCommand extends Command
             'class_name' => $className,
             'brick_name' => $brickName,
             'brick_label' => $brickLabel,
-            'preview_path' => $viewsPath . '.' . $view . '.preview',
-            'html_path' => $viewsPath . '.' . $view . '.index',
+            'html_path' => $viewsPath . '.' . $view,
         ]);
 
-        $this->copyStubToApp('brick-view', $previewPath);
         $this->copyStubToApp('brick-view', $htmlPath);
 
         $this->components->info("Mason brick [{$fullNamespace}] created successfully.");

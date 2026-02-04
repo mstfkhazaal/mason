@@ -6,6 +6,7 @@ use Awcodes\Mason\Brick;
 use Filament\Actions\Action;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
+use Throwable;
 
 class {{ class_name }} extends Brick
 {
@@ -24,12 +25,15 @@ class {{ class_name }} extends Brick
         return parent::getLabel();
     }
 
+    /**
+     * @throws Throwable
+     */
     public static function toHtml(array $config, ?array $data = null): ?string
     {
         return view('{{ html_path }}', [
             'config' => $config,
             'data' => $data,
-        ]);
+        ])->render();
     }
 
     public static function configureBrickAction(Action $action): Action
