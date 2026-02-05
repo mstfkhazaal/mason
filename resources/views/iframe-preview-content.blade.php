@@ -155,13 +155,29 @@
         let selectedBlock = null
         let dblClickToEdit = false
         let isDisabled = false
+        let instanceId = null // Store instance ID for multi-instance support
+
+        // Helper to send messages back to parent with instanceId
+        function postToParent(message) {
+            window.parent.postMessage({ ...message, instanceId }, '*')
+        }
 
         // Listen for messages from parent
         window.addEventListener('message', function (event) {
             // Security: verify origin if needed
             // if (event.origin !== window.location.origin) return;
 
-            const { type, ...data } = event.data
+            const { type, instanceId: msgInstanceId, ...data } = event.data
+
+            // Capture instanceId from parent for multi-instance support
+            if (msgInstanceId && !instanceId) {
+                instanceId = msgInstanceId
+            }
+
+            // Ignore messages from other instances
+            if (msgInstanceId && instanceId && msgInstanceId !== instanceId) {
+                return
+            }
 
             switch (type) {
                 case 'setContent':
@@ -214,7 +230,7 @@
         // Send ready message when loaded
         window.addEventListener('load', function () {
             updateAllMoveButtons()
-            window.parent.postMessage({ type: 'ready' }, '*')
+            postToParent({ type: 'ready' })
         })
 
         // Forward undo/redo shortcuts to parent
@@ -229,17 +245,14 @@
                     event.key === 'y' ||
                     event.key === 'Y'
                 ) {
-                    window.parent.postMessage(
-                        {
-                            type: 'keyboardShortcut',
-                            key: event.key,
-                            ctrlKey: event.ctrlKey,
-                            metaKey: event.metaKey,
-                            shiftKey: event.shiftKey,
-                            altKey: event.altKey,
-                        },
-                        '*',
-                    )
+                    postToParent({
+                        type: 'keyboardShortcut',
+                        key: event.key,
+                        ctrlKey: event.ctrlKey,
+                        metaKey: event.metaKey,
+                        shiftKey: event.shiftKey,
+                        altKey: event.altKey,
+                    })
                     event.preventDefault()
                 }
             }
@@ -248,7 +261,7 @@
         function updateContent(blocks) {
             // This will be handled by reloading the iframe with new content
             // For now, we'll just notify parent that we need a reload
-            window.parent.postMessage({ type: 'contentUpdated' }, '*')
+            postToParent({ type: 'contentUpdated' })
             // Update buttons after a short delay to ensure DOM is updated
             setTimeout(updateAllMoveButtons, 100)
         }
@@ -266,46 +279,34 @@
         }
 
         function insertBlock(brick, position) {
-            window.parent.postMessage(
-                {
-                    type: 'insertBlockRequest',
-                    brick,
-                    position,
-                },
-                '*',
-            )
+            postToParent({
+                type: 'insertBlockRequest',
+                brick,
+                position,
+            })
         }
 
         function updateBlock(index, brick) {
-            window.parent.postMessage(
-                {
-                    type: 'updateBlockRequest',
-                    index,
-                    brick,
-                },
-                '*',
-            )
+            postToParent({
+                type: 'updateBlockRequest',
+                index,
+                brick,
+            })
         }
 
         function deleteBlock(index) {
-            window.parent.postMessage(
-                {
-                    type: 'deleteBlockRequest',
-                    index,
-                },
-                '*',
-            )
+            postToParent({
+                type: 'deleteBlockRequest',
+                index,
+            })
         }
 
         function moveBlock(from, to) {
-            window.parent.postMessage(
-                {
-                    type: 'moveBlockRequest',
-                    from,
-                    to,
-                },
-                '*',
-            )
+            postToParent({
+                type: 'moveBlockRequest',
+                from,
+                to,
+            })
         }
 
         function selectBlock(index) {
@@ -375,53 +376,38 @@
                 )
 
                 if (actionType === 'edit') {
-                    window.parent.postMessage(
-                        {
-                            type: 'editBlock',
-                            index,
-                            brickId,
-                            config,
-                        },
-                        '*',
-                    )
+                    postToParent({
+                        type: 'editBlock',
+                        index,
+                        brickId,
+                        config,
+                    })
                 } else if (actionType === 'delete') {
-                    window.parent.postMessage(
-                        {
-                            type: 'deleteBlockRequest',
-                            index,
-                        },
-                        '*',
-                    )
+                    postToParent({
+                        type: 'deleteBlockRequest',
+                        index,
+                    })
                 } else if (actionType === 'move-up') {
                     if (!action.disabled) {
-                        window.parent.postMessage(
-                            {
-                                type: 'moveBlockRequest',
-                                from: index,
-                                to: index - 1,
-                            },
-                            '*',
-                        )
+                        postToParent({
+                            type: 'moveBlockRequest',
+                            from: index,
+                            to: index - 1,
+                        })
                     }
                 } else if (actionType === 'move-down') {
                     if (!action.disabled) {
-                        window.parent.postMessage(
-                            {
-                                type: 'moveBlockRequest',
-                                from: index,
-                                to: index + 1,
-                            },
-                            '*',
-                        )
+                        postToParent({
+                            type: 'moveBlockRequest',
+                            from: index,
+                            to: index + 1,
+                        })
                     }
                 } else if (actionType === 'add') {
-                    window.parent.postMessage(
-                        {
-                            type: 'openBrickPicker',
-                            blockIndex: index,
-                        },
-                        '*',
-                    )
+                    postToParent({
+                        type: 'openBrickPicker',
+                        blockIndex: index,
+                    })
                 }
             } else {
                 // Click on block content - select it
@@ -452,15 +438,12 @@
             const config = JSON.parse(block.getAttribute('data-config') || '{}')
 
             // Trigger edit action
-            window.parent.postMessage(
-                {
-                    type: 'editBlock',
-                    index,
-                    brickId,
-                    config,
-                },
-                '*',
-            )
+            postToParent({
+                type: 'editBlock',
+                index,
+                brickId,
+                config,
+            })
         })
 
         // Handle drag and drop for repositioning blocks
@@ -683,14 +666,11 @@
                     // Send the target index as position in the original array
                     // handleMoveBlock will adjust for the removal
                     if (targetIndex >= 0 && targetIndex <= totalBlocks) {
-                        window.parent.postMessage(
-                            {
-                                type: 'moveBlockRequest',
-                                from: draggedBlockIndex,
-                                to: targetIndex,
-                            },
-                            '*',
-                        )
+                        postToParent({
+                            type: 'moveBlockRequest',
+                            from: draggedBlockIndex,
+                            to: targetIndex,
+                        })
                     }
                 }
 
@@ -707,14 +687,11 @@
                     const brickId = e.dataTransfer.getData('brick')
 
                     if (brickId && !isNaN(position)) {
-                        window.parent.postMessage(
-                            {
-                                type: 'insertBlockRequest',
-                                brickId,
-                                position,
-                            },
-                            '*',
-                        )
+                        postToParent({
+                            type: 'insertBlockRequest',
+                            brickId,
+                            position,
+                        })
                     }
                 }
             }

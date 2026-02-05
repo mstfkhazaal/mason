@@ -79,7 +79,12 @@ export default function masonComponent({
                 // Security: verify origin if needed
                 // if (event.origin !== window.location.origin) return
 
-                const { type, ...data } = event.data
+                const { type, instanceId, ...data } = event.data
+
+                // Ignore messages from other instances
+                if (instanceId && instanceId !== statePath) {
+                    return
+                }
 
                 switch (type) {
                     case 'ready':
@@ -213,7 +218,8 @@ export default function masonComponent({
 
         sendMessageToIframe(message) {
             if (iframe && iframe.contentWindow) {
-                iframe.contentWindow.postMessage(message, '*')
+                // Include instanceId for multi-instance support
+                iframe.contentWindow.postMessage({ ...message, instanceId: statePath }, '*')
             }
         },
 
@@ -509,7 +515,7 @@ export default function masonComponent({
             const form = document.createElement('form')
             form.method = 'POST'
             form.action = '/mason/preview'
-            form.target = 'mason-preview-iframe'
+            form.target = iframe.name
             form.style.display = 'none'
 
             // Add blocks data

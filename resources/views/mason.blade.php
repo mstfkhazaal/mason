@@ -79,7 +79,7 @@
                 >
                     <iframe
                         x-ref="previewIframe"
-                        name="mason-preview-iframe"
+                        name="{{ "mason-preview-iframe-" . $statePath }}"
                         class="mason-iframe"
                         wire:ignore
                     ></iframe>
