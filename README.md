@@ -60,7 +60,20 @@ return [
     'entry' => [
         'layout' => 'mason::iframe-entry',
     ],
+    'routes' => [
+        'middleware' => ['web', 'auth'],
+    ],
 ];
+```
+
+### Auth Guards
+
+By default, Mason uses the `web` and `auth` middleware for its routes internally. If you are using a different guard or have multiple guards, you can customize the middleware used by updating the `routes.middleware` configuration option in the published config file.
+
+```php
+'routes' => [
+    'middleware' => ['web', 'auth:admin'],
+],
 ```
 
 ## Usage
