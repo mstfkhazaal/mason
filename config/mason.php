@@ -13,4 +13,7 @@ return [
     'entry' => [
         'layout' => 'mason::iframe-entry', // Set to your layout view path, e.g., 'layouts.entry'
     ],
+    'routes' => [
+        'middleware' => ['web', 'auth'],
+    ],
 ];
