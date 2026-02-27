@@ -1,7 +1,7 @@
 <img src="https://res.cloudinary.com/aw-codes/image/upload/c_scale,w_1200/thumbnails/awcodes-mason.webp" alt="mason opengraph image" width="1200" height="auto" class="filament-hidden" style="width: 100%;" />
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/awcodes/mason.svg?style=flat-square)](https://packagist.org/packages/awcodes/mason)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/awcodes/mason/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/awcodes/mason/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![Latest Version](https://img.shields.io/github/release/awcodes/mason.svg?style=flat-square)](https://github.com/awcodes/mason/releases)
+[![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Total Downloads](https://img.shields.io/packagist/dt/awcodes/mason.svg?style=flat-square)](https://packagist.org/packages/awcodes/mason)
 
 # Mason
