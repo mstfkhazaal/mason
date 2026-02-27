@@ -3,7 +3,7 @@
 [![Latest Version](https://img.shields.io/github/release/awcodes/mason.svg?style=flat-square)](https://github.com/awcodes/mason/releases)
 [![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Total Downloads](https://img.shields.io/packagist/dt/awcodes/mason.svg?style=flat-square)](https://packagist.org/packages/awcodes/mason)
-![GitHub Repo stars](https://img.shields.io/github/stars/awcodes/mason)
+![GitHub Repo stars](https://img.shields.io/github/stars/awcodes/mason?style=flat-square)
 
 # Mason
 
