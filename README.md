@@ -1,4 +1,4 @@
-<img src="https://res.cloudinary.com/aw-codes/image/upload/w_1200,f_auto,q_auto/thumbnails/awcodes-mason.jpg" alt="mason opengraph image" width="1200" height="auto" class="filament-hidden" style="width: 100%;" />
+<img src="https://res.cloudinary.com/aw-codes/image/upload/c_scale,w_1200/thumbnails/awcodes-mason.webp" alt="mason opengraph image" width="1200" height="auto" class="filament-hidden" style="width: 100%;" />
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/awcodes/mason.svg?style=flat-square)](https://packagist.org/packages/awcodes/mason)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/awcodes/mason/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/awcodes/mason/actions?query=workflow%3Arun-tests+branch%3Amain)
