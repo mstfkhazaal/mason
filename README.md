@@ -2,10 +2,10 @@
 
 A simple block-based drag and drop page / document builder field for Filament.
 
-[![Latest Version](https://img.shields.io/github/release/awcodes/mason.svg?style=flat-square)](https://github.com/awcodes/mason/releases)
-[![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Total Downloads](https://img.shields.io/packagist/dt/awcodes/mason.svg?style=flat-square)](https://packagist.org/packages/awcodes/mason)
-![GitHub Repo stars](https://img.shields.io/github/stars/awcodes/mason?style=flat-square)
+[![Latest Version](https://img.shields.io/github/release/awcodes/mason.svg?style=flat-square&color=blue&label=Release)](https://github.com/awcodes/mason/releases)
+[![MIT Licensed](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE.md)
+[![Total Downloads](https://img.shields.io/packagist/dt/awcodes/mason.svg?style=flat-square&color=blue&label=Downloads)](https://packagist.org/packages/awcodes/mason)
+[![GitHub Repo stars](https://img.shields.io/github/stars/awcodes/mason?style=flat-square&color=blue&label=Stars)](https://github.com/awcodes/mason/stargazers)
 
 ## Compatibility
 
