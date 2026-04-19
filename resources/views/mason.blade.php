@@ -6,6 +6,9 @@
     $statePath = $getStatePath();
     $isDisabled = $isDisabled();
     $actions = collect($getActions())->filter(fn ($action) => $action->getName() !== 'insertBrick')->toArray();
+    $locales = $getLocales();
+    $localeStyle = $getLocaleStyle();
+    $defaultLocale = $getDefaultLocale();
 @endphp
 
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
@@ -21,7 +24,10 @@
             livewireId: @js($this->getId()),
             state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')", isOptimisticallyLive: false) }},
             statePath: @js($statePath),
-            placeholder: @js($getPlaceholder())
+            placeholder: @js($getPlaceholder()),
+            locales: @js($locales),
+            localeStyle: @js($localeStyle->value),
+            defaultLocale: @js($defaultLocale)
         })"
         id="{{ 'mason-wrapper-' . $statePath }}"
         class="mason-wrapper"
@@ -58,7 +64,7 @@
 
             @if (! $isDisabled && filled($actions))
                 <div wire:key="sidebar-{{ hash('sha256', json_encode($actions)) }}">
-                    <x-mason::sidebar :actions="$actions" />
+                    <x-mason::sidebar :actions="$actions" :locales="$locales" :localeStyle="$localeStyle" />
                 </div>
             @endif
         </x-filament::input.wrapper>

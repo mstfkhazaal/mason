@@ -14,6 +14,16 @@ class Renderer extends Component
         return Helpers::sanitizeLivewire(view($path, $attrs ?? [])->toHtml());
     }
 
+    #[Isolate]
+    public function getViewWithLocale(string $path, ?array $attrs, ?string $locale): ?string
+    {
+        if ($locale) {
+            app()->setLocale($locale);
+        }
+
+        return Helpers::sanitizeLivewire(view($path, $attrs ?? [])->toHtml());
+    }
+
     public function render(): string
     {
         return <<<'HTML'

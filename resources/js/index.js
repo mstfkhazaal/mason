@@ -64,6 +64,9 @@ export default function masonComponent({
     state,
     statePath,
     placeholder = null,
+    locales = [],
+    localeStyle = 'dropdown',
+    defaultLocale = 'en',
 }) {
     let editor = null;
 
@@ -80,6 +83,11 @@ export default function masonComponent({
         isInsertingBrick: false,
         isInsertingBrickPosition: null,
         editorSelection: { type: 'text', anchor: 0, head: 1 },
+        locales: locales,
+        localeStyle: localeStyle,
+        currentLocale: defaultLocale,
+        showLocaleDropdown: false,
+        showLocaleModal: false,
         init: function () {
 
             if (this.state?.content?.length > 0) {
@@ -452,6 +460,35 @@ export default function masonComponent({
                 { editorSelection: this.editorSelection },
                 this.key
             )
+        },
+        changeLocale: function (locale) {
+            this.currentLocale = locale;
+            this.refreshPreview();
+        },
+        refreshPreview: async function () {
+            if (!this.state?.content?.length) {
+                return;
+            }
+
+            const renderer = document.querySelector('#mason-brick-renderer').getAttribute('wire:id');
+
+            for (const node of this.state.content) {
+                if (node.type === 'masonBrick') {
+                    node.attrs.view = await window.Livewire
+                        .find(renderer)
+                        .call('getViewWithLocale', node.attrs.path, node.attrs.values, this.currentLocale)
+                        .then(e => e);
+                }
+            }
+
+            this.shouldUpdateState = false;
+            editor.commands.setContent(this.state);
+        },
+        toggleLocaleDropdown: function () {
+            this.showLocaleDropdown = !this.showLocaleDropdown;
+        },
+        toggleLocaleModal: function () {
+            this.showLocaleModal = true;
         },
         scrollToCurrentBrick: function () {
             this.$nextTick(() => {
