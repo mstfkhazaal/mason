@@ -4,6 +4,7 @@ namespace Awcodes\Mason;
 
 use Awcodes\Mason\Actions\InsertBrick;
 use Awcodes\Mason\Concerns\HasBricks;
+use Awcodes\Mason\Concerns\HasLocales;
 use Awcodes\Mason\Concerns\HasSidebar;
 use Awcodes\Mason\Support\Helpers;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
@@ -19,6 +20,7 @@ class Mason extends Field implements CanBeLengthConstrained
     use HasBricks;
     use HasExtraAlpineAttributes;
     use HasExtraInputAttributes;
+    use HasLocales;
     use HasPlaceholder;
     use HasSidebar;
 
